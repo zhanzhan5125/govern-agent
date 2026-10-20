@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-30",
+  "command": ".\\.venv\\Scripts\\python.exe scripts\\benchmark_runtime_harness.py --runs 200",
+  "environment": {
+    "python": "3.10.11",
+    "platform": "win32",
+    "database": "sqlite",
+    "scope": "framework-only; excludes model and network latency"
+  },
+  "fresh_three_node_run": {
+    "baseline_checkpoint_only": {
+      "runs": 200,
+      "mean_ms": 11.4693,
+      "median_ms": 10.8746,
+      "p95_ms": 12.4163,
+      "min_ms": 9.3181,
+      "max_ms": 117.3608
+    },
+    "optimized_hook_journal_checkpoint": {
+      "runs": 200,
+      "mean_ms": 59.1333,
+      "median_ms": 55.504,
+      "p95_ms": 58.6858,
+      "min_ms": 51.6847,
+      "max_ms": 385.252
+    },
+    "mean_overhead_ms": 47.664,
+    "mean_overhead_ms_per_node": 15.888,
+    "p95_overhead_ms_per_node": 15.4232,
+    "relative_slowdown": 5.1558
+  },
+  "resume_three_completed_nodes": {
+    "runs": 200,
+    "mean_ms": 21.9982,
+    "median_ms": 20.7849,
+    "p95_ms": 22.3771,
+    "min_ms": 18.3506,
+    "max_ms": 249.3015
+  },
+  "side_effect_replay": {
+    "runs": 200,
+    "mean_ms": 0.7273,
+    "median_ms": 0.7035,
+    "p95_ms": 0.8965,
+    "min_ms": 0.6092,
+    "max_ms": 1.5881,
+    "handler_calls": 1,
+    "duplicate_handler_calls": 0
+  },
+  "artifact_offload_128k": {
+    "runs": 50,
+    "mean_ms": 10.2373,
+    "median_ms": 10.2192,
+    "p95_ms": 10.8332,
+    "min_ms": 9.2444,
+    "max_ms": 13.8656,
+    "original_payload_bytes": 131072,
+    "model_visible_bytes": 2415,
+    "visible_reduction_percent": 98.16,
+    "artifact_count": 1
+  },
+  "journal_sample": {
+    "event_count": 16,
+    "sequences_monotonic": true
+  }
+}

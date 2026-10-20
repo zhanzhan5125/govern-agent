@@ -1,0 +1,129 @@
+diff --git a/packages/agent/src/agent-loop.ts b/packages/agent/src/agent-loop.ts
+index f406aba..21cd4ae 100644
+--- a/packages/agent/src/agent-loop.ts
++++ b/packages/agent/src/agent-loop.ts
+@@ -239,7 +239,16 @@ async function runLoop(
+ 			}
+ 
+ 			// Stream assistant response
+-			const message = await streamAssistantResponse(currentContext, config, signal, emit, streamFunction);
++			const reservation = config.governBudget?.reserve(currentContext.messages, config.maxTokens ?? 2048);
++            let message: AssistantMessage;
++            try {
++                message = await streamAssistantResponse(currentContext, config, signal, emit, streamFunction);
++                const usage = message.usage;
++                reservation?.settle(usage ? usage.input + usage.output + usage.cacheRead + usage.cacheWrite : undefined);
++            } catch (error) {
++                reservation?.settle();
++                throw error;
++            }
+ 			newMessages.push(message);
+ 
+ 			if (message.stopReason === "error" || message.stopReason === "aborted") {
+@@ -714,6 +723,7 @@ async function prepareToolCall(
+ 	tools: readonly AgentTool<any>[] = currentContext.tools ?? [],
+ ): Promise<PreparedToolCall | ImmediateToolCallOutcome> {
+ 	const tool = tools.find((t) => t.name === toolCall.name);
++	if ("governBudget" in config) (config as AgentLoopConfig).governBudget?.takeTool();
+ 	if (!tool) {
+ 		return {
+ 			kind: "immediate",
+diff --git a/packages/agent/src/agent.ts b/packages/agent/src/agent.ts
+index ee8e6e5..675affc 100644
+--- a/packages/agent/src/agent.ts
++++ b/packages/agent/src/agent.ts
+@@ -112,6 +112,7 @@ function createMutableAgentState(initialState?: AgentInitialState): MutableAgent
+ 
+ /** Options for constructing an {@link Agent}. */
+ export interface AgentOptions {
++    governBudget?: import("./govern-budget.ts").SharedBudget;
+ 	initialState?: AgentInitialState;
+ 	convertToLlm?: (messages: AgentMessage[]) => Message[] | Promise<Message[]>;
+ 	transformContext?: (messages: AgentMessage[], signal?: AbortSignal) => Promise<AgentMessage[]>;
+@@ -207,6 +208,7 @@ export class Agent {
+ 		signal?: AbortSignal,
+ 	) => Promise<AfterToolCallResult | undefined>;
+ 	public finishTurn?: FinishTurn;
++    public governBudget?: import("./govern-budget.ts").SharedBudget;
+ 	public prepareRequest?: PrepareRequest;
+ 	public prepareNextTurn?: (
+ 		signal?: AbortSignal,
+@@ -241,6 +243,7 @@ export class Agent {
+ 		this.beforeToolCall = runtimeOptions.beforeToolCall;
+ 		this.afterToolCall = runtimeOptions.afterToolCall;
+ 		this.finishTurn = runtimeOptions.finishTurn;
++        this.governBudget = runtimeOptions.governBudget;
+ 		this.prepareRequest = runtimeOptions.prepareRequest;
+ 		this.prepareNextTurn = runtimeOptions.prepareNextTurn;
+ 		this.prepareNextTurnWithContext = runtimeOptions.prepareNextTurnWithContext;
+@@ -468,6 +471,7 @@ export class Agent {
+ 		let skipInitialSteeringPoll = options.skipInitialSteeringPoll === true;
+ 		return {
+ 			model: this._state.model,
++			governBudget: this.governBudget,
+ 			reasoning: this._state.thinkingLevel === "off" ? undefined : this._state.thinkingLevel,
+ 			sessionId: this.sessionId,
+ 			onPayload: this.onPayload,
+diff --git a/packages/agent/src/index.ts b/packages/agent/src/index.ts
+index ca00bc7..49b37f1 100644
+--- a/packages/agent/src/index.ts
++++ b/packages/agent/src/index.ts
+@@ -3,3 +3,4 @@ export * from "./agent-loop.ts";
+ export * from "./proxy.ts";
+ export { setDefaultStreamFn } from "./stream-fn.ts";
+ export * from "./types.ts";
++export * from "./govern-budget.ts";
+diff --git a/packages/agent/src/types.ts b/packages/agent/src/types.ts
+index dbfba74..d41d167 100644
+--- a/packages/agent/src/types.ts
++++ b/packages/agent/src/types.ts
+@@ -191,6 +191,7 @@ export type PrepareRequest = (
+ export interface PrepareNextTurnContext extends AgentTurnContext {}
+ 
+ export interface AgentLoopConfig extends SimpleStreamOptions {
++    governBudget?: import("./govern-budget.ts").SharedBudget;
+ 	model: Model<any>;
+ 
+ 	/**
+diff --git a/packages/agent/src/govern-budget.ts b/packages/agent/src/govern-budget.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/agent/src/govern-budget.ts
+@@ -0,0 +1,37 @@
++/** Govern Core extension: one atomic JS budget shared by parent/child loops. */
++export class SharedBudget {
++  usedTokens = 0;
++  reservedTokens = 0;
++  turns = 0;
++  tools = 0;
++  readonly controller = new AbortController();
++  readonly started = Date.now();
++  constructor(readonly limits = { tokens: 120000, turns: 60, tools: 100, milliseconds: 900000 }) {}
++  check(): void {
++    if (this.controller.signal.aborted) throw new Error("Govern budget cancelled");
++    if (Date.now() - this.started > this.limits.milliseconds) this.exhaust("time");
++  }
++  private exhaust(kind: string): never {
++    this.controller.abort();
++    throw new Error(`Govern shared ${kind} budget exhausted`);
++  }
++  reserve(messages: unknown[], output: number): { settle: (actual?: number) => void } {
++    this.check();
++    const amount = Math.ceil(JSON.stringify(messages).length / 2) + output;
++    if (this.turns >= this.limits.turns) this.exhaust("turn");
++    if (this.usedTokens + this.reservedTokens + amount > this.limits.tokens) this.exhaust("token");
++    this.turns++; this.reservedTokens += amount;
++    let settled = false;
++    return { settle: (actual?: number) => {
++      if (settled) return;
++      settled = true; this.reservedTokens -= amount;
++      this.usedTokens += actual === undefined ? amount : Math.max(0, actual);
++      if (this.usedTokens + this.reservedTokens > this.limits.tokens) this.exhaust("token");
++    }};
++  }
++  takeTool(): void {
++    this.check();
++    if (this.tools >= this.limits.tools) this.exhaust("tool");
++    this.tools++;
++  }
++}

@@ -1,0 +1,47 @@
+# Python and local tooling
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.idea/
+.vscode/
+*.egg-info/
+frontend/node_modules/
+build/
+dist/
+node_modules/
+.coverage
+htmlcov/
+
+# Credentials and runtime state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.log
+
+# Local outputs and backups
+/tmp/
+/output/
+/artifacts/
+*.zip
+
+# Evaluator-owned data may contain private repository contents.
+/evolution-data/*
+!/evolution-data/README.md
+
+.DS_Store
+Thumbs.db
+pi-runtime/vendor/
+.govern/
+govern.config.json
+*.egg-info/

@@ -1,0 +1,18 @@
+{
+  "model_prices": {},
+  "evaluate_runtime": false,
+  "policy_overrides": {},
+  "execution_profiles": {},
+  "jira": {
+    "mcp": {"url": "http://127.0.0.1:9000/mcp", "headers": {}},
+    "acceptance_field": "acceptance_criteria",
+    "bug_project": "PAY",
+    "priority_map": {"P0": "Highest", "P1": "High", "P2": "Medium"},
+    "tools": {
+      "get_issue": {"name": "jira_get_issue", "arguments": {"issue_key": "issue_key"}},
+      "list_requirements": {"name": "jira_list_children", "arguments": {}},
+      "find_bug": {"name": "jira_find_bug_by_marker", "arguments": {}},
+      "create_bug": {"name": "jira_create_bug", "arguments": {}}
+    }
+  }
+}

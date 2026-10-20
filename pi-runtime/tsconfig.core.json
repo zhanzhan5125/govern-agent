@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ES2022","module":"NodeNext","moduleResolution":"NodeNext","strict":true,"skipLibCheck":true,"declaration":true,"outDir":"vendor/pi/packages/agent/dist","rootDir":"vendor/pi/packages/agent/src","rewriteRelativeImportExtensions":true},"include":["vendor/pi/packages/agent/src/**/*.ts"]}

@@ -1,0 +1,3 @@
+packages: []
+overrides:
+  '@earendil-works/pi-agent-core': link:vendor/pi/packages/agent

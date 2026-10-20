@@ -1,0 +1,193 @@
+{
+  "audit_date": "2026-09-26",
+  "scope": "Local deterministic scoring audit only; no LLM calls, no product multi-agent evaluation, no production quality claim.",
+  "dataset_file_sha256": "e3cf61546e0f554c045a79949202532046f7e936d8bbb1e2f5d0de2b79634d74",
+  "cases": 100,
+  "sources": {
+    "synthetic-controlled": 100
+  },
+  "risk_categories": {
+    "SEC-EVAL": 4,
+    "SEC-HARDCODED-SECRET": 4,
+    "REL-EMPTY-EXCEPT": 5,
+    "SEC-WEAK-RANDOM": 1,
+    "REL-UNBOUNDED-RETRY": 1,
+    "SEC-SQL-CONCAT": 4,
+    "SEC-ASSERT-AUTH": 1,
+    "SEC-INSECURE-COOKIE": 1,
+    "SEC-SUBPROCESS-SHELL": 4,
+    "REL-DEBUG-PRINT": 4,
+    "REL-FLOAT-MONEY": 1,
+    "REL-NAIVE-DATETIME": 1,
+    "SEC-PATH-TRAVERSAL": 1,
+    "REL-BLOCKING-ASYNC": 1,
+    "SEC-YAML-LOAD": 1,
+    "REL-NONATOMIC-WRITE": 1,
+    "SEC-PICKLE-LOAD": 1,
+    "SEC-WEAK-HASH": 1,
+    "SEC-OPEN-REDIRECT": 1,
+    "SEC-INSECURE-TEMPFILE": 1,
+    "SEC-LOG-FORGING": 1
+  },
+  "severity": {
+    "critical": 4,
+    "high": 15,
+    "medium": 16,
+    "low": 5
+  },
+  "splits": {
+    "validation": {
+      "cases": 80,
+      "risk": 32,
+      "clean": 48,
+      "severity": {
+        "critical": 4,
+        "high": 12,
+        "medium": 12,
+        "low": 4
+      }
+    },
+    "holdout": {
+      "cases": 20,
+      "risk": 8,
+      "clean": 12,
+      "severity": {
+        "high": 3,
+        "medium": 4,
+        "low": 1
+      }
+    }
+  },
+  "runs": {
+    "six_rule_reference": {
+      "metrics": {
+        "tp": 25,
+        "fp": 5,
+        "fn": 15,
+        "precision": 0.8333,
+        "recall": 0.625,
+        "f1": 0.7143,
+        "high_total": 19,
+        "high_hits": 16,
+        "high_risk_recall": 0.8421,
+        "clean_hits": 55,
+        "clean_cases": 60,
+        "clean_accuracy": 0.9167,
+        "execution_success_rate": 1.0
+      },
+      "by_split": {
+        "validation": {
+          "tp": 22,
+          "fp": 5,
+          "fn": 10,
+          "precision": 0.8148,
+          "recall": 0.6875,
+          "f1": 0.7458,
+          "high_total": 16,
+          "high_hits": 14,
+          "high_risk_recall": 0.875,
+          "clean_hits": 43,
+          "clean_cases": 48,
+          "clean_accuracy": 0.8958,
+          "execution_success_rate": 1.0
+        },
+        "holdout": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 5,
+          "precision": 1.0,
+          "recall": 0.375,
+          "f1": 0.5455,
+          "high_total": 3,
+          "high_hits": 2,
+          "high_risk_recall": 0.6667,
+          "clean_hits": 12,
+          "clean_cases": 12,
+          "clean_accuracy": 1.0,
+          "execution_success_rate": 1.0
+        }
+      },
+      "high_risk_misses": [
+        {
+          "id": "pr-0062",
+          "repository": "acme/service-07",
+          "expected_types": [
+            "SEC-PATH-TRAVERSAL"
+          ]
+        },
+        {
+          "id": "pr-0072",
+          "repository": "acme/service-08",
+          "expected_types": [
+            "SEC-YAML-LOAD"
+          ]
+        },
+        {
+          "id": "pr-0082",
+          "repository": "acme/service-09",
+          "expected_types": [
+            "SEC-PICKLE-LOAD"
+          ]
+        }
+      ]
+    },
+    "fourteen_rule_combination": {
+      "metrics": {
+        "tp": 33,
+        "fp": 7,
+        "fn": 7,
+        "precision": 0.825,
+        "recall": 0.825,
+        "f1": 0.825,
+        "high_total": 19,
+        "high_hits": 18,
+        "high_risk_recall": 0.9474,
+        "clean_hits": 55,
+        "clean_cases": 60,
+        "clean_accuracy": 0.9167,
+        "execution_success_rate": 1.0
+      },
+      "by_split": {
+        "validation": {
+          "tp": 28,
+          "fp": 7,
+          "fn": 4,
+          "precision": 0.8,
+          "recall": 0.875,
+          "f1": 0.8358,
+          "high_total": 16,
+          "high_hits": 16,
+          "high_risk_recall": 1.0,
+          "clean_hits": 43,
+          "clean_cases": 48,
+          "clean_accuracy": 0.8958,
+          "execution_success_rate": 1.0
+        },
+        "holdout": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1.0,
+          "recall": 0.625,
+          "f1": 0.7692,
+          "high_total": 3,
+          "high_hits": 2,
+          "high_risk_recall": 0.6667,
+          "clean_hits": 12,
+          "clean_cases": 12,
+          "clean_accuracy": 1.0,
+          "execution_success_rate": 1.0
+        }
+      },
+      "high_risk_misses": [
+        {
+          "id": "pr-0082",
+          "repository": "acme/service-09",
+          "expected_types": [
+            "SEC-PICKLE-LOAD"
+          ]
+        }
+      ]
+    }
+  }
+}

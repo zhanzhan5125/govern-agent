@@ -1,0 +1,20 @@
+{
+  "name": "govern-pi-runtime",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {"node": ">=22.19.0"},
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "check": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "build:core": "tsc -p tsconfig.core.json"
+  },
+  "dependencies": {
+    "@earendil-works/pi-ai": "1.3.0",
+    "@earendil-works/pi-coding-agent": "1.3.0",
+    "@earendil-works/pi-agent-core": "link:vendor/pi/packages/agent",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {"@types/node": "^24.0.0", "typescript": "^5.9.0", "tsx": "^4.20.0"}
+}

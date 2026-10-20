@@ -1,0 +1,1622 @@
+{
+  "format": 1,
+  "purpose": "Clean source copy for a user-managed GitHub upload",
+  "excluded": [
+    "virtual environments",
+    "actual dotenv files",
+    "databases",
+    "private keys",
+    "caches",
+    "IDE settings",
+    "runtime outputs",
+    "external evaluation datasets"
+  ],
+  "file_count": 321,
+  "files": [
+    {
+      "path": ".dockerignore",
+      "bytes": 234,
+      "sha256": "9e0749b1e3213cef393ac6edb2d3590e3ddaa6ac45369d7de4a743d3d7e9c1b2"
+    },
+    {
+      "path": ".env.example",
+      "bytes": 3548,
+      "sha256": "34d4ca6e5db5a82c48be8dd56d6f7c1bff78f6f1c57d8728e58a2ae002862c98"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 533,
+      "sha256": "354fd63835cb646a9a622c6a874832bfa53befb89a1240852ee4ac4c20e9118a"
+    },
+    {
+      "path": "data/benchmarks/pr_diff_100.jsonl",
+      "bytes": 68075,
+      "sha256": "e3cf61546e0f554c045a79949202532046f7e936d8bbb1e2f5d0de2b79634d74"
+    },
+    {
+      "path": "docker-compose.yml",
+      "bytes": 1638,
+      "sha256": "d3ecd992a8f59b945135c282cb6c35f6b73ac9a59660b363800c855af52dfe91"
+    },
+    {
+      "path": "Dockerfile",
+      "bytes": 267,
+      "sha256": "22d1cde7d0b2a69c03bf70c1b2fda5d87b7e674871a07066dd9be6eb97f46ff2"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-1-0.png",
+      "bytes": 29051,
+      "sha256": "2bcef2b365e02253e68c2be00884a451a30e559d698d349563f3550adf71a558"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-10-0.png",
+      "bytes": 677126,
+      "sha256": "35206ceb61ef133b9a4ecebec034eff40582e52cff576627aae42cd0eed3569b"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-100-0.png",
+      "bytes": 7717,
+      "sha256": "ddffc661f161e912a0df89cda3a886c302b79be7b93fff9581f4c81e178c8594"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-101-0.png",
+      "bytes": 17694,
+      "sha256": "ba057002d725ed50855f4cf6ea097d06cf70c32017345b9cff2d17e9690b8d87"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-101-1.png",
+      "bytes": 9689,
+      "sha256": "691161821f5e6c76b7d5e7ff4f97876b51b9c393cf4da90ff604c4a56b87db7f"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-102-0.png",
+      "bytes": 99988,
+      "sha256": "f65b19bde6c40e29d5098c773f1e992cbc7fe023dc4c05fe498465e9b9c710e7"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-103-0.png",
+      "bytes": 7926,
+      "sha256": "f7a849318de63d629b6c9ee6634cd7665f7266f10c29db8e5426a7ab3a24d9e3"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-104-0.png",
+      "bytes": 39575,
+      "sha256": "a87845df53d23f5ffb7efc74138c2c8e3b7bc50fcda0e57ba7a4513dc621a7f5"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-105-0.png",
+      "bytes": 10713,
+      "sha256": "a11fa33687c8660e8adee4664453e57e9e07a2ab8051d574e52df8b00b8f9b53"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-106-0.png",
+      "bytes": 24102,
+      "sha256": "f3517f1b8c8550ee86c9bb355617c8641647b91dc0e3e7059a7f26db433abab5"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-107-0.png",
+      "bytes": 14030,
+      "sha256": "aedbda5cba0aee6be89ea3f06772ffd15d77db605906084c2a630979f20ba5a6"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-107-1.png",
+      "bytes": 22636,
+      "sha256": "1fb0f6b7a92d2451553fb7191ed1d6a55ec5adebc55009a6dae8cc86b3b45382"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-108-1.png",
+      "bytes": 25108,
+      "sha256": "2c09eea31a256106d427f9025cc564b93190efec02e88c327ffe21247c85160a"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-109-0.png",
+      "bytes": 7769,
+      "sha256": "b1a5af8ede549068d95e7b7bec7eac7fab34886971457450d0aebfa3536ae5f3"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-11-0.png",
+      "bytes": 7709,
+      "sha256": "c1f4579b5ee88c705ca435c6c6dbdbfa3bb46eae3d188425bd00656b4608289f"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-11-1.png",
+      "bytes": 50677,
+      "sha256": "23d10b47ad2b923235e9d82675dadbf07947771c1045c58f66650e7d99280b1b"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-111-1.png",
+      "bytes": 13981,
+      "sha256": "c3de01ab44e0f41bc9b2a1a7cfcdb7230c6fe61fe02118944763daf6c09581df"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-112-0.png",
+      "bytes": 23481,
+      "sha256": "dd591cc309ed308197b9dabe545803eceaad3d8aea79ea7159a0a61ed64d1d1e"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-113-0.png",
+      "bytes": 17398,
+      "sha256": "35e766a7fe419d5400aff80a973c7a1345f18beaf2e82c96b55945b148683bba"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-114-1.png",
+      "bytes": 17070,
+      "sha256": "2cbc1f6dd35cfffdea0aa744158c57216c8f1667b1992b2171b5af2a4ee8110b"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-116-0.png",
+      "bytes": 44094,
+      "sha256": "fc41fd2b8225440b3de179fca7af12ebad85b162cd75a6d64ebe8e27f250d639"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-12-0.png",
+      "bytes": 15435,
+      "sha256": "4aec833f784928192559f48d07ee7aadc3da38942c3266e0c9ec9fb839321a48"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-12-1.png",
+      "bytes": 16322,
+      "sha256": "26549193a639b93b9a45daffb4e61bc5934a6099854a9e51319a65efc97576ec"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-12-2.png",
+      "bytes": 27827,
+      "sha256": "888f7c4813dbbe2ae72339dc054e0e574bcd2953f71c0d4fd70ca2ad007f34c7"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-120-0.png",
+      "bytes": 10867,
+      "sha256": "31951dfb256c4ccfb40280fba789a0b0f4afd710d264f9cf77db22b6167b441d"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-120-1.png",
+      "bytes": 6236,
+      "sha256": "5dfed7a43562adb475cf34ae72543f8281daf364277361a8e2ba57508c3f0ba0"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-121-0.png",
+      "bytes": 7726,
+      "sha256": "7068d0ec067e27ab6dfea34ae0535b26f6e892445b841212fe083813ee0cc65c"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-13-2.png",
+      "bytes": 6208,
+      "sha256": "13cc0d7f9242ce42143b982ae7bcb334cd1a073839e424f69ded5b677b0789a6"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-13-3.png",
+      "bytes": 9925,
+      "sha256": "2ea4bbe109db743119298f1e4e05c4d758011e7274e7e4f198502d2608bb39fa"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-13-4.png",
+      "bytes": 93580,
+      "sha256": "3ffb61f31e3450f51e0352177e9e15b7e8c3c33af81ff24455de33ef32f543b5"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-130-0.png",
+      "bytes": 8903,
+      "sha256": "c9f556466059b2775291e9ef02387222d646d5dc5cb9dd6432e52b1de361437c"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-131-0.png",
+      "bytes": 7479,
+      "sha256": "31bb22a47eca6a54f616a70db3de3a34a7d0eaa3ca9633ab050da3034b522d1a"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-131-1.png",
+      "bytes": 25187,
+      "sha256": "bd4595db04e0b840a29fdb0942d90ac0d038f29e74eb86175c4ccd375fca8482"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-14-1.png",
+      "bytes": 7784,
+      "sha256": "047ca86d922a6852d9e3272185bc1d9344dc5f2051946fc069a7147d2436bb73"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-14-3.png",
+      "bytes": 27342,
+      "sha256": "73a9d99a1654b00b8a19f3da324b2d2606e99e069d945c1f811dc7c782e5e3af"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-14-4.png",
+      "bytes": 13302,
+      "sha256": "8ca00238754b3f040c0421cbfa7c1f5a6d7c9947d2214303ce684a19520ef7df"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-14-5.png",
+      "bytes": 6948,
+      "sha256": "f5a76531c1fcf78933c6f728c92a4f6a38fb6208bcceaec26b2a9d03b757cbf9"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-15-0.png",
+      "bytes": 268062,
+      "sha256": "d2e9394d45d9b25590cf111210a460d263244dfe1793eb07ea41e8280e5823b3"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-16-0.png",
+      "bytes": 18069,
+      "sha256": "79df82d7484f8d5b4d57184ecc66c3590a3529f11640c771fafeed988ad7fd14"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-16-1.png",
+      "bytes": 6162,
+      "sha256": "e807c1f5c696a5fc2485c140a465ebb2b483943ea64289552459c3e3c26e49a9"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-16-2.png",
+      "bytes": 16165,
+      "sha256": "59eb23f189aa2cf2ff6613db525dd0f811f48e8bdcccc807542c42be5c97037c"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-17-0.png",
+      "bytes": 6135,
+      "sha256": "d0e43b464f6cdcef7152fb39a1ae26b2fd0966792ea06c3d0f887f17ea9ccff4"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-17-1.png",
+      "bytes": 65647,
+      "sha256": "c0800ab028cfe97e9024d745fdf8f66e2cedeebbc89e74eb276b8816955de119"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-17-2.png",
+      "bytes": 8826,
+      "sha256": "a3c645420bbc13f62afaaeed73f22771605e6f61520f2792054258a141fb201d"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-17-3.png",
+      "bytes": 8343,
+      "sha256": "07d9bd2dc1a721390655638b9b191346eabdb430317f314b9d133a64e506ea6e"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-18-0.png",
+      "bytes": 11649,
+      "sha256": "649daa34e8e9312463957da61383cfe5d49d731bdaf83b63aed84e1d8fa4fe3b"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-18-1.png",
+      "bytes": 7810,
+      "sha256": "08d884ccb489a63844dfb982673af46017bdedbb0658f0d74418f7c76770c5f0"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-18-2.png",
+      "bytes": 31291,
+      "sha256": "983db306dba3af6d5920e7088533323a9a7c1420bf4fd39e76fc18f108eeb71b"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-18-3.png",
+      "bytes": 9051,
+      "sha256": "7a36dd65b5244b0433050e7d51aa805d17afd8334e2385c2965d26fcef68d32a"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-18-4.png",
+      "bytes": 28224,
+      "sha256": "a15d7d49d4da42b58707eb7dff2121755b5715961ae779ef35a22d2a6d01f62e"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-19-0.png",
+      "bytes": 21247,
+      "sha256": "bd80db8976b9a81369a1d109756c5a76b9755288d8265421b16594d50fedb463"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-2-0.png",
+      "bytes": 53915,
+      "sha256": "7280bbadac09c293ddf63281e993f5cb668bafeed14ff289f469c000993a4381"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-2-1.png",
+      "bytes": 16693,
+      "sha256": "0ba899249d4eec1e292f96fb4cafbbd0a896913e3a9053b81e971a30ad7a4f62"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-2-2.png",
+      "bytes": 22664,
+      "sha256": "3328a1079014f9718c3f4a036a1e1013df6374bd5aa999153225916ce80e805e"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-20-0.png",
+      "bytes": 6681,
+      "sha256": "e69837a53ffc503b9f431dc136f3e4cd3d0bb137d0489179109dd451e42c3351"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-20-1.png",
+      "bytes": 11084,
+      "sha256": "fd4f2c559e110ae8dfd2e1d07715a23d597a38cbe42f5c3df7efd0f7cc910953"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-20-2.png",
+      "bytes": 10555,
+      "sha256": "0eb10753ae0e9b65c4f3657a71ef48ce0e6d180ab728c840e873ef07c98215d7"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-21-0.png",
+      "bytes": 8432,
+      "sha256": "81aa30241c9053d7853c7cdecd8a8ad483b48f74537eae2444abf736099fe0f8"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-21-1.png",
+      "bytes": 261932,
+      "sha256": "e8995962a7ece6044adc08a15e44fc45ecfc05d48b00c130693e4198d89447ff"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-22-0.png",
+      "bytes": 351665,
+      "sha256": "5627c015cebcdb5d449751ecd9f9cc6b17676603c03ebf56b8c895d7f4c60a22"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-22-1.png",
+      "bytes": 42692,
+      "sha256": "92340946e9c1ceac25fe73af5d3ff4f70e88c3f2cc7bc7735562b60361144503"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-23-0.png",
+      "bytes": 13504,
+      "sha256": "3cb97029dd338aad04c6c0eec188991d43a968323d4ff77ebd8ed7055a7e1b1e"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-23-1.png",
+      "bytes": 19090,
+      "sha256": "4468c3bf9e30308c5db28bab8040e34f4136e90882fbf19c73de1773b5f9a40d"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-23-2.png",
+      "bytes": 34793,
+      "sha256": "89dacc101a2d46d49ed5ec688d82e4c87335059b4e83f242605c1ea9ece42748"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-25-0.png",
+      "bytes": 24088,
+      "sha256": "76493638f37b91e6a3792865ef41899782be3216458439d1114cc5f9313161cc"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-26-0.png",
+      "bytes": 29535,
+      "sha256": "2f893f29e945e3b26d306bab67539bc81329ddd38b5fa152d414ac96cf25d8ba"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-27-0.png",
+      "bytes": 25946,
+      "sha256": "39d6d5128fd292ddb127d64cba968ec631b1d2c32cd3a82adc773596af3efa8e"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-28-1.png",
+      "bytes": 8852,
+      "sha256": "19d9a4aee5681a833716878646b0d56540eeee659b7bbceecba9004c99ab9504"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-29-7.png",
+      "bytes": 63116,
+      "sha256": "611ac9e11e110ada7e5304b8d84128d80eabb306dcc569f74f050d3e8687ab75"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-3-0.png",
+      "bytes": 15407,
+      "sha256": "cbb31ecbc17340d58d78cd42d84f336e9d1c2bfbe4674701fdf016ece54ecdfd"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-3-1.png",
+      "bytes": 19590,
+      "sha256": "fc19b077d3d72067ea87d95f5b95090c95967499bba0c277b5b04945a9619ad4"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-31-0.png",
+      "bytes": 87111,
+      "sha256": "9418980f25d63a428958f158025cbf6ab89004ead6be4bcc030a73d64e5e81b5"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-32-1.png",
+      "bytes": 38766,
+      "sha256": "e266ed0839399db98b6b620da7ad21a6bd3bf1af498c170b02dcc7f2a6d7b31d"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-32-2.png",
+      "bytes": 26977,
+      "sha256": "578d7f1b60952947dd5ae29a5a4fd619b83e5fa33809b362bc0bd2ab95506866"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-34-5.png",
+      "bytes": 13517,
+      "sha256": "a61e1c2a569599daf05e0d6743609487a923cde5c9dc943c83f796248eaa896d"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-35-1.png",
+      "bytes": 60363,
+      "sha256": "f8b8f65ab49c573961dcec7096e6c3396e6f6d8b31841c42a4a963fe8c779d9a"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-36-3.png",
+      "bytes": 42202,
+      "sha256": "89a5e8cfe256527d7a4f0ac77496466141253aa03aaa57decbbdd985c60dba55"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-37-2.png",
+      "bytes": 32734,
+      "sha256": "e854d35034135bbd8512bb06fe3f037a9886c8fad2b75bcf5f6c4c17424ccf69"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-39-0.png",
+      "bytes": 60294,
+      "sha256": "ced7fa0a0f05bd75deb23f8cfb322634ad82460ace0273b706682509b8951717"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-4-0.png",
+      "bytes": 745903,
+      "sha256": "5bcb2cfcfe43809e23115d7482edd39ad78534ee24f438d5e5e8f0eca788d471"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-42-0.png",
+      "bytes": 5883,
+      "sha256": "2737519b67d00e74d1909ec6cd9ee0edfc8292ac0c60699c2e9a5185bdf3cd0c"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-45-0.png",
+      "bytes": 39046,
+      "sha256": "f574c690ce18a5eb941213985ec7805796cf611f33938d224a1992f33f7c7390"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-45-1.png",
+      "bytes": 25532,
+      "sha256": "d670e0f6889d5240fc681664ba150e592ffea3a4eca07a3316da8a65e94b53d5"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-46-2.png",
+      "bytes": 22203,
+      "sha256": "78f322d7d1702d11e282372fcb1381f2128ad2bd7db876b702e5009a737a97e8"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-46-3.png",
+      "bytes": 14472,
+      "sha256": "ce9200539992590822220e50f5fd5c0ccb2682a3dcb023b61ce951aa8f23dd6e"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-48-0.png",
+      "bytes": 51707,
+      "sha256": "1c3f5645a4174e621774d472f5893be7ac0c87f8b8676e745b5aa597b462317c"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-49-0.png",
+      "bytes": 24182,
+      "sha256": "2bac5564f746fb1843e6ec33717be3a6948af20220a1391ab534a028e9bc019f"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-5-0.png",
+      "bytes": 18673,
+      "sha256": "f92948ed1042fe08d83897a7ee392ef780f346f8a2c0dc685ae0be34e3c6bec3"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-50-1.png",
+      "bytes": 17693,
+      "sha256": "0fc53e52f4109d1a383fce76b9ee953cb4ab139c5c8ec9208c947005addfe08b"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-50-3.png",
+      "bytes": 14646,
+      "sha256": "a957a072b75c9ba23d2e730b40588751867f82a0e9c151cb16dbc91e769154b6"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-51-0.png",
+      "bytes": 17507,
+      "sha256": "3a7a902fc444f9ce8b861f7d87cbc87cb1c37ba6da1c962837e9088d2f52ad43"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-51-3.png",
+      "bytes": 15246,
+      "sha256": "1d748f637c0bc309a68a776966551bdbf79635d5ed53ac613c1431bb36e3a6ca"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-52-1.png",
+      "bytes": 51682,
+      "sha256": "b6d6469fc9f4946fc0404e92c488b3279e5c06205e9058c9ae1f3ce8b0b7a839"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-53-0.png",
+      "bytes": 36160,
+      "sha256": "fb4d0ea380085680f4c9cb0e4e3c76722d256959ca309c8c984290c06a8e908f"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-57-0.png",
+      "bytes": 11593,
+      "sha256": "a9a27ff0e14c48ab55464b7449d348c37d9f0e02b031a4d1759c5e2b7727f4a3"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-57-1.png",
+      "bytes": 8177,
+      "sha256": "c0fcb57b21b950b7a6e7b69f521ac9313742c21c1dcd3ab0c7b9565d36a7c482"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-57-2.png",
+      "bytes": 8969,
+      "sha256": "65ee1c12b54af46e2afb2f7d3537ab6b764107191805fc65ea419665cd05446f"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-6-0.png",
+      "bytes": 7206,
+      "sha256": "a3ecd8a71de2a8152a7476cf51557c04e5d6cf6537955240c183d48a31871de7"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-6-1.png",
+      "bytes": 10007,
+      "sha256": "0b5bd277d4717c51f6e6c3554abbb666ba51db4e02bad70519d1928ea99ade74"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-6-2.png",
+      "bytes": 6289,
+      "sha256": "607f87dc401a0869bb354b8a7be65b87a5a809bfc564a53ab2bb8b909970a865"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-6-3.png",
+      "bytes": 7771,
+      "sha256": "1fe6e9f00ab820cd25be94250ff1ac8c928be871ec65e15c8f70f3943730d0dc"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-6-4.png",
+      "bytes": 7069,
+      "sha256": "97f4c08ad63cc77706f91b2377a38a4f4f4aceed367bd0b5a7177eac3d73038b"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-61-0.png",
+      "bytes": 64693,
+      "sha256": "12341d9374816683f276fdecf91430f9c4ed27806bc701581186095d5e877f17"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-61-3.png",
+      "bytes": 3692,
+      "sha256": "8727199ba7ee20c9e80c2c5c3ca04118f8cc400170de5e20e4dc77f68489e2c0"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-62-0.png",
+      "bytes": 9473,
+      "sha256": "64642390eb5d08f8c4d5b0edd3ac760af1ee4475b07b9133b269b88e960469c3"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-62-1.png",
+      "bytes": 40499,
+      "sha256": "9651acb7180bde7461bc231d751963daec0244f0212327368bf6b0648a836aa9"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-62-2.png",
+      "bytes": 8069,
+      "sha256": "e46d695417e7dd3448e11ad50b1e27efdf9346e5677634b22a5423913aad68f1"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-64-0.png",
+      "bytes": 11141,
+      "sha256": "0bfec5f086d58ff5933fdfa797816f5b79673e78002eade91c9674ef00897cc2"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-64-1.png",
+      "bytes": 21438,
+      "sha256": "97171fa787403d3f653e11c4d056d7bd550bb90463c47ade5ccc5e6bf1850196"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-64-2.png",
+      "bytes": 34668,
+      "sha256": "bc8e7183def37339688c1f05aa5bbbf02ddae7971708a98651deafb8b798618e"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-65-0.png",
+      "bytes": 12049,
+      "sha256": "7e14ddaeea0e5cdd09fc9d5bb0b694349ba7baeab9354c70e30aeb2b203bca64"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-65-2.png",
+      "bytes": 41044,
+      "sha256": "f35b20d0069e8aef290abb32e00ecf6e32cf025bde787c2541422e6c51b84a2a"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-66-0.png",
+      "bytes": 24344,
+      "sha256": "cee7bda0e33593d9faa3b1c162cb2eb8a325f2136a1f41aa20934f8bc3116a40"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-66-1.png",
+      "bytes": 12186,
+      "sha256": "672369aaeaccf097aa04391cd2ab92da9877c45bdf707c6b6b9ffaf723cf8987"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-67-0.png",
+      "bytes": 9363,
+      "sha256": "1b5db14aba0c4cab487100dd705d0108b0e1a0d3e7a70a2324aa7cd9ccdc7272"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-67-1.png",
+      "bytes": 47327,
+      "sha256": "12383c39d6492abc7a5f5ae2b94b725aa9747983c0789bece939c0b7f01b44ac"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-68-1.png",
+      "bytes": 10756,
+      "sha256": "50e77ac207954b165137318f8eef924bf2f3ac7ddf79f62531e9acaa27919cc1"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-68-2.png",
+      "bytes": 16040,
+      "sha256": "cd6fa86004f6de2abf2276fc03db69abe3b7ab16add769821307d4e6e9f22c20"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-68-3.png",
+      "bytes": 9046,
+      "sha256": "c18f5f0dfae8ce2364dcbb34ca79c1bca020a43ea7b153fc14c77a0e7a8e14b2"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-68-4.png",
+      "bytes": 6682,
+      "sha256": "22d288d3ebd7165910cc1b3c2cdbbdc12f789d30eea380b339c4c6061c06274b"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-69-0.png",
+      "bytes": 49854,
+      "sha256": "e828826037ed7b173ae5734d6bdd9270d404031779ce5da4f911d3c0671d2681"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-69-1.png",
+      "bytes": 20952,
+      "sha256": "280add1c870ee8845d1472022b0d1e0179035e384712111f838cbeb032829600"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-69-2.png",
+      "bytes": 7473,
+      "sha256": "5e4edcebd3d7a1c731a3da18483b78eee1ab38a1d913d30979d1f546d31a6419"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-7-0.png",
+      "bytes": 7800,
+      "sha256": "631628e516c0b9683c37fc0c0e3a417caef211ec9eae0e17c573aeee71a7a752"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-71-4.png",
+      "bytes": 23738,
+      "sha256": "ffa421362d2251b33848fc169a119341f4c53a7bad954587074453a036256677"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-71-5.png",
+      "bytes": 27669,
+      "sha256": "4fb7d4d790ec6f590f1cf0efe6fa569eb328f2e70c3d0c0d5e4e5b9396769f18"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-72-1.png",
+      "bytes": 26698,
+      "sha256": "e29bed9936e2c722ff8f657d47c01f5c62d73efa4394b70f89e2cd4d0c7b7601"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-73-0.png",
+      "bytes": 38564,
+      "sha256": "46eaea87330489cc3691b46add4bb8487196b1e25b19dc727d84dd92aa586c25"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-75-2.png",
+      "bytes": 15993,
+      "sha256": "b74e4f9c97cb2393ed20ccf0a881f4c312aad8efd859c07fc21ca0ec8e167596"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-77-0.png",
+      "bytes": 14306,
+      "sha256": "0b41f84dcb3332daea86e01d6e852f7ad648e514d86422bb22bb61a57867ab4c"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-77-1.png",
+      "bytes": 16744,
+      "sha256": "dc32e25ca9f0fc4c17d4de704a0eea62ffe871688037148be3a3369ed66d4b2d"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-79-0.png",
+      "bytes": 16343,
+      "sha256": "e59e908a5a69068cd940c72b2fb644a79c314562d5fb092e413f19e7832e0bf5"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-79-8.png",
+      "bytes": 6809,
+      "sha256": "b981962f12a3d585c8d19568f0068f379f3fac69b31b6b40b01db636aa41a109"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-8-0.png",
+      "bytes": 12500,
+      "sha256": "1d918b172ac67a794d3a133420c1994d2c6ebaa9f779733cfeb184156183878d"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-8-1.png",
+      "bytes": 14993,
+      "sha256": "1b6734f733037c2611c11f9995dfe27c53390e9b92d21f8ca72f20cf031c9827"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-80-0.png",
+      "bytes": 26523,
+      "sha256": "215f030943c3e6fa0ce564e5d00272475daaf11fe5117749c1203fa3e82ff282"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-80-1.png",
+      "bytes": 8429,
+      "sha256": "71ee9238c6aef7b83d512ff2e808dc47fd54791cbde66eca2733e7565261506a"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-80-2.png",
+      "bytes": 14228,
+      "sha256": "d2918176d8bfd46328644b28fc65cbd1ab43bf2a11db12609f6c1a8bd4e75f90"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-81-1.png",
+      "bytes": 6186,
+      "sha256": "2c4d41f305b9ca3a378c3505b37656371a48713f2c6140d00f70f0c441c8a396"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-81-2.png",
+      "bytes": 6809,
+      "sha256": "fed5904423d296c846dd7da2ac67ca9e93b876dcfc332274da937ba2917b1c4c"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-81-4.png",
+      "bytes": 14436,
+      "sha256": "e5aeb933e3366c568cc31da254c957e68bd6a1aa344c40d9a5f9a0d81bebd9b9"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-82-0.png",
+      "bytes": 5978,
+      "sha256": "1d0dfb452f91121f1685720131f675341aaf1a9460851e683ec054d6ad7e3405"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-82-1.png",
+      "bytes": 8250,
+      "sha256": "a13008cda2209274a2473f02747e19ed0383bc70607cb88056a555e1016ee64f"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-83-2.png",
+      "bytes": 7067,
+      "sha256": "21e35cd1f5baa6072d2961e2889e332c7563028d9dea6d9d6814f4dd616c3205"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-83-3.png",
+      "bytes": 9485,
+      "sha256": "c2c72f6c0798d41a176b4c9e4ab52f187bfce49b192cf23e6c8d77274ecb0914"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-84-0.png",
+      "bytes": 21417,
+      "sha256": "7eb490fce6b14360ce7cac13545151c4bd30721b63335c2f6f89344ba8fc32f7"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-84-1.png",
+      "bytes": 17439,
+      "sha256": "924f5225f297a7acd3be0ff2a89b1d5ab1c4fa7941800a37e2191d9c75d12f57"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-84-2.png",
+      "bytes": 5875,
+      "sha256": "a973cd704c9627ea5715d1c8c843ef7c3eb5b1195d074ba8ba4e50087c19e05c"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-85-1.png",
+      "bytes": 37827,
+      "sha256": "cacae4a96cfd14db91c7f756a2a723dea24756b8e8de70b936640299907174d2"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-86-1.png",
+      "bytes": 44656,
+      "sha256": "c5421b214c52d93f69f8418c8a3429abfa64d077945c3174062b1f78f2ada294"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-87-0.png",
+      "bytes": 6168,
+      "sha256": "7ec88db54679013e562a175e38f4e20d7582631042a3a399426bfd6f188e001a"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-87-1.png",
+      "bytes": 5748,
+      "sha256": "ca46be7f11d144607453ccdb6265c06c8acd0775db64745fecbbc12f4e14b781"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-87-2.png",
+      "bytes": 17906,
+      "sha256": "e916817c0ca0506a954d3e45a96363fd3096048c30c4659f1eeb55ca2b810b06"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-88-1.png",
+      "bytes": 23690,
+      "sha256": "e14dca8287aa9618d55f39230d79368874cb0c9a69660ee8397416ef5235746d"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-89-0.png",
+      "bytes": 5468,
+      "sha256": "62cd07d4e4f806c1b858f911dfccbc116740d0b7a744ce8f8520df22f694b35b"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-9-0.png",
+      "bytes": 1079995,
+      "sha256": "3263fd58ce81cfdb813be630c6892b05877d48800106a6ed8e5a3c829fc01e75"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-90-0.png",
+      "bytes": 14264,
+      "sha256": "70cb5a2cc92a3ecae113ba158cbb02ebb7c2bfb27b563911fa26db5d69fe9e6f"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-90-1.png",
+      "bytes": 37889,
+      "sha256": "ce0e889eb615cafa615db8f8d2f0aa34d07b1502faf8a24f44b418d08b36c490"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-93-0.png",
+      "bytes": 20091,
+      "sha256": "881e55863249f7ab43658e1a204673d248e86d41bed060d9eba14128db53cb7a"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-93-1.png",
+      "bytes": 9628,
+      "sha256": "0a2c025cdbd8affe79ac2065e1cec4692cb5a88273035c8d913de9f8b57a2683"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-94-0.png",
+      "bytes": 15205,
+      "sha256": "fc4bde9dfa29e3561e644520e4eb0bdbb5e49dea346c8b6a66762d5129fc2f64"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-94-1.png",
+      "bytes": 31469,
+      "sha256": "2fac1a362e91c6d36465e6acc5b2b0f2a2c8e5d259350489f84020412b142c67"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-95-1.png",
+      "bytes": 29578,
+      "sha256": "a6e902204055234ddfc02e5b1acf3dfb2b3917a630c94213c12f6a100f724148"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-95-2.png",
+      "bytes": 15891,
+      "sha256": "79b0728062e3385c3871280da686c11a34049a66cf27b6b36b8357ff100d6e9d"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-97-0.png",
+      "bytes": 9579,
+      "sha256": "9868854d81f61549988b7e2383fd59591efd52ea1bef9405293a57690380363a"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-97-1.png",
+      "bytes": 15036,
+      "sha256": "3d0619bc8ee2afb3136d3cd1bc2ac61d04df067de7953ca7a9207da4d914129f"
+    },
+    {
+      "path": "docs/assets/EvoAgent_md_assets/EvoAgent-99-0.png",
+      "bytes": 8183,
+      "sha256": "8c241786cf96254194deac1ad3e4768acfb1b5b938d96f904f7b01fcf454535f"
+    },
+    {
+      "path": "docs/benchmarks/context_memory_benchmark.json",
+      "bytes": 16082,
+      "sha256": "80f887afa00924f873cf716cfea01c50aa1dc44b7a2832d25c7eaf152d1ae47c"
+    },
+    {
+      "path": "docs/benchmarks/interview_metric_audit.json",
+      "bytes": 4764,
+      "sha256": "23fc724c61d882310d2f1ab0bda3cd13e9232ef4f0535feb3d5f16d25367dc9c"
+    },
+    {
+      "path": "docs/benchmarks/runtime_harness_benchmark.json",
+      "bytes": 1730,
+      "sha256": "abae913cf7f643fcd7442b593b0b40fde1ccff283f370a70969a9a7c151011c1"
+    },
+    {
+      "path": "docs/design/Context_Memory_优化后完整说明.md",
+      "bytes": 21298,
+      "sha256": "2375f70acf229a1bc950cf42e945e0c4c6afa184dac77d54eb251af1dc997e5f"
+    },
+    {
+      "path": "docs/design/EvoAgent_四方向优化方案.md",
+      "bytes": 36812,
+      "sha256": "08b6fc435e15cc841c09835fffa7a3af33e64a2575f79851e18695459a66e9ec"
+    },
+    {
+      "path": "docs/design/Runtime_Harness_优化后完整说明.md",
+      "bytes": 22057,
+      "sha256": "fc806bad4f40673bd54ea81760eb34eccb1aba18082fc60ea3a7ef8aec38ec73"
+    },
+    {
+      "path": "docs/design/Self_Evolution_优化实施记录.md",
+      "bytes": 15303,
+      "sha256": "f22b865133cbc91f47dce8cc4cdf719872a3631fe1ac7b6c1ee05d8cbc8b36f1"
+    },
+    {
+      "path": "docs/design/Self_Evolution_治理使用说明.md",
+      "bytes": 9027,
+      "sha256": "09f2204dac6e420035df6104fad0318a4b80a22e7919bd4792ef2982b7e9384b"
+    },
+    {
+      "path": "docs/design/模块化目录与迁移说明.md",
+      "bytes": 4048,
+      "sha256": "5672762c9f4588c16aac356738d61c290728de890f21b3a5d78288c0c6fa5b23"
+    },
+    {
+      "path": "docs/design/模块重构检查报告.md",
+      "bytes": 3683,
+      "sha256": "df396e6b734615bc9b903005aa9598d9c72853b783524f6296b43c4952d260c5"
+    },
+    {
+      "path": "docs/interview/EvoAgent_面试准备手册.md",
+      "bytes": 261298,
+      "sha256": "89cb892880e2b35d13f4651b335c837568cee961eca8649b16ef27abd675d5d5"
+    },
+    {
+      "path": "docs/interview/STAR法则_项目与实习经历编写指南.md",
+      "bytes": 14652,
+      "sha256": "5a7c8d231d131c044b199be6d26b6c811b831daed6072d278231511b2ad32ee5"
+    },
+    {
+      "path": "docs/project/EvoAgent：自进化Harness智能体 (3)_1.md",
+      "bytes": 236392,
+      "sha256": "74644e241449a86ca4caac637b3a97077d33fd334cabb4706e2a6fd58be4cb13"
+    },
+    {
+      "path": "docs/project/EvoAgent：自进化Harness智能体 (3)_1.pdf",
+      "bytes": 5003050,
+      "sha256": "5c936d2f84f200112b091eead1a6961ad431973578f09d8bdcf1a72aba17bc83"
+    },
+    {
+      "path": "docs/README.md",
+      "bytes": 1471,
+      "sha256": "1931df1db4333fd4494074458e260118f69d80d859c149f2a25b302252d2aba0"
+    },
+    {
+      "path": "evoagent/__init__.py",
+      "bytes": 60,
+      "sha256": "fe89ebd7d587ab0302851c192358c6be19eabe228fb34023e19522907e452afe"
+    },
+    {
+      "path": "evoagent/__main__.py",
+      "bytes": 87,
+      "sha256": "32d10cd380ee2260c04dbc657bb22100b40f4dfc3decbf51c25ae4e122b3530b"
+    },
+    {
+      "path": "evoagent/agents/__init__.py",
+      "bytes": 22,
+      "sha256": "25f1fe8d1d9866d7fbfe0a7deb070aed55ec860f5e65a0a9d0b4236acd376791"
+    },
+    {
+      "path": "evoagent/agents/agentic_core.py",
+      "bytes": 64854,
+      "sha256": "5942c1893e391fdce0400e666162e78555b7493266a07d62a3acb033204c29ed"
+    },
+    {
+      "path": "evoagent/agents/gates.py",
+      "bytes": 4048,
+      "sha256": "4446e350d7a07e0620dc274021abf3b5c9a786799a84c00ff919b4a74676e1fe"
+    },
+    {
+      "path": "evoagent/agents/llm.py",
+      "bytes": 3153,
+      "sha256": "628461b45ad461d97d639ab094b9b35f28bf380211f801a056641d4a9001476a"
+    },
+    {
+      "path": "evoagent/agents/report.py",
+      "bytes": 4261,
+      "sha256": "563476c91c42a0470f11f8054fdfc4dffd711efcd3d27b5f12b9e3c07c2b913b"
+    },
+    {
+      "path": "evoagent/agents/repository_tools.py",
+      "bytes": 20962,
+      "sha256": "780693c04eaf4ae923810c75d050a0d3b391c5d756b6cd25c4de7a2b6d3788a5"
+    },
+    {
+      "path": "evoagent/agents/reviewer.py",
+      "bytes": 13210,
+      "sha256": "798daac62d808b1bad91d5a9fe761d160188d6bb0f149fc0fa5ad44b63827891"
+    },
+    {
+      "path": "evoagent/application/__init__.py",
+      "bytes": 27,
+      "sha256": "8514a7f4d89ad725646ae4f14b28760bea128206a81031c86ba63c4f95cfb106"
+    },
+    {
+      "path": "evoagent/application/api.py",
+      "bytes": 33024,
+      "sha256": "5c9cb35feb44ee59bb7ecc0fb5d1337bb276c11dcb2657c13813c5a33ff988b6"
+    },
+    {
+      "path": "evoagent/application/service.py",
+      "bytes": 36108,
+      "sha256": "24814710c2db49c853a1fc2a4559095c4ed7f0091848e488f1402e1826c7e869"
+    },
+    {
+      "path": "evoagent/core/__init__.py",
+      "bytes": 20,
+      "sha256": "69063ebe47c670cd5d9f3a3335879af67ac8567fb76fe1af8bdf84e6079b9ae1"
+    },
+    {
+      "path": "evoagent/core/config.py",
+      "bytes": 15871,
+      "sha256": "63e67d64fa4ea8e5248cdf3ad437e0bd9746afedec5cffd7345252d0b4e4f046"
+    },
+    {
+      "path": "evoagent/core/diff_parser.py",
+      "bytes": 1469,
+      "sha256": "fd40009d51b07dacae2f5d4903158fa15c187f13d25277552bc10d6735223071"
+    },
+    {
+      "path": "evoagent/core/models.py",
+      "bytes": 2733,
+      "sha256": "1534671e0731167576dc44ff5d21b03d7059772097047abdc4c7db18823abe88"
+    },
+    {
+      "path": "evoagent/core/modes.py",
+      "bytes": 2309,
+      "sha256": "5675a0478ca8815515e879f16360a59ec4754910c912d8dbb20a9c23e483be53"
+    },
+    {
+      "path": "evoagent/evaluation/__init__.py",
+      "bytes": 26,
+      "sha256": "292ba13cac690f75cb29b6529b7ebc4bcc64d7164b3629043be07b863f333aea"
+    },
+    {
+      "path": "evoagent/evaluation/compression_eval.py",
+      "bytes": 5861,
+      "sha256": "7edb939c1f1307fab490abd737710c116bb6aa03a624d4b8d60a7678fddb0736"
+    },
+    {
+      "path": "evoagent/evaluation/evaluation_benchmark.py",
+      "bytes": 12381,
+      "sha256": "15a9c3fa43b5035ef0548e90315e4036edd113ff15dc7a0823a4bf59161d66c2"
+    },
+    {
+      "path": "evoagent/evaluation/evaluation_harness.py",
+      "bytes": 22111,
+      "sha256": "3dc55933f7b6cd31ebedd74e7ed32d7183464ddccf7aa36970c9573433f3f128"
+    },
+    {
+      "path": "evoagent/evaluation/evaluation_v2.py",
+      "bytes": 21084,
+      "sha256": "3ef2d66dfa271f548ff67f175a82d72bbed799c35b6afbade6c9d04d9dc948f3"
+    },
+    {
+      "path": "evoagent/evaluation/evolution_proof.py",
+      "bytes": 18066,
+      "sha256": "b06988a58b24a1789c4decc0c53a59894110ca1a5a9599c53150b957cc29556f"
+    },
+    {
+      "path": "evoagent/evolution/__init__.py",
+      "bytes": 25,
+      "sha256": "0078bde24f8bd93ddf170d4ba37a412ca41f7983f6ddee712aaea1e84b6d2934"
+    },
+    {
+      "path": "evoagent/evolution/candidate_builder.py",
+      "bytes": 1399,
+      "sha256": "f48dde0ce577a2a8aa194b48dace4c7cab7f7f80d977a806abd040f144b4cb33"
+    },
+    {
+      "path": "evoagent/evolution/candidate_policy.py",
+      "bytes": 6458,
+      "sha256": "38aa1264a58d626a8a5f13e2a97f8192061512ad5754b1c8a91df86cbb3508e9"
+    },
+    {
+      "path": "evoagent/evolution/candidate_store.py",
+      "bytes": 21515,
+      "sha256": "89bc15cee9ffbe88a963965b9e10f4e1b8d81a93be5730ab93dbfe8e7a18118b"
+    },
+    {
+      "path": "evoagent/evolution/evolution.py",
+      "bytes": 29570,
+      "sha256": "d0a84a0bc039afc2aebdf5efa2677f3474ad89fd4e30441d8b2978a6b0c8b9d0"
+    },
+    {
+      "path": "evoagent/evolution/evolution_lease.py",
+      "bytes": 4653,
+      "sha256": "168fb33914a5381816d16514ae1932695c58f2304df93004603cd9f0bff88cc9"
+    },
+    {
+      "path": "evoagent/evolution/evolution_monitor.py",
+      "bytes": 2627,
+      "sha256": "768790dfc131e636c2752a607e0d26b76593ef45ee3a3095f188f10be6306d37"
+    },
+    {
+      "path": "evoagent/evolution/evolution_pipeline.py",
+      "bytes": 14280,
+      "sha256": "e0feae5c336b9f102f3c4b4f238c44af6c0ad4c1608a5846608e386ba28738ff"
+    },
+    {
+      "path": "evoagent/evolution/evolution_replay.py",
+      "bytes": 12544,
+      "sha256": "646e82dfbfa568bcffad7f31ae09d54d2c17735417546fb587663df224b1a414"
+    },
+    {
+      "path": "evoagent/evolution/evolution_v2.py",
+      "bytes": 3706,
+      "sha256": "7c256eb2d0064b1cf27d88f6847a43b0436598a23eead9203fc5080aa7b17458"
+    },
+    {
+      "path": "evoagent/evolution/failure_diagnosis.py",
+      "bytes": 5544,
+      "sha256": "bde66ff08d483c157d79d36f0f7d0623f332883484d167b6462c466b8b0a0705"
+    },
+    {
+      "path": "evoagent/evolution/rollout.py",
+      "bytes": 3124,
+      "sha256": "674730cd9e681fd0407c2e3793b8a98cf607a129d88b3321413b7dd044fadf77"
+    },
+    {
+      "path": "evoagent/infrastructure/__init__.py",
+      "bytes": 30,
+      "sha256": "83bf5e6001714a800f3d8d1ff88ec3e22e376cf5edc987a9f1b73540850f3cae"
+    },
+    {
+      "path": "evoagent/infrastructure/metrics.py",
+      "bytes": 1443,
+      "sha256": "fd2c6db5dae706be853841dc23e3b6c06c7708d01484ab476bf81485d4bde172"
+    },
+    {
+      "path": "evoagent/infrastructure/observability.py",
+      "bytes": 2721,
+      "sha256": "645fbee39305f1f9ec881936d11a07f0aa37a02c576ea9e0a62dc6c55d4e7d7f"
+    },
+    {
+      "path": "evoagent/infrastructure/task_queue.py",
+      "bytes": 6931,
+      "sha256": "d62d5abb0873d2594574a5670012416ca44837f4a8666970df09752451c05cc9"
+    },
+    {
+      "path": "evoagent/infrastructure/telemetry.py",
+      "bytes": 5062,
+      "sha256": "5044b245ade2be5452be48942d62b9c61df77a46d798524f2609a0345d1b8ae3"
+    },
+    {
+      "path": "evoagent/integrations/__init__.py",
+      "bytes": 28,
+      "sha256": "24ac984ad9793e8131e53d0f051edcfd26e7a962178ac3e9e0f19a0b73e184f6"
+    },
+    {
+      "path": "evoagent/integrations/auth.py",
+      "bytes": 5682,
+      "sha256": "28f5b59f33a0dd6a9c8ef1de9b19dba047956457b14a9ff66e0e3914bae5a3ac"
+    },
+    {
+      "path": "evoagent/integrations/github.py",
+      "bytes": 9784,
+      "sha256": "d57e5f2f7df3adbbc9d14d8402c960ed6d6c6dff5fed804e39a5cd9465892c06"
+    },
+    {
+      "path": "evoagent/memory/__init__.py",
+      "bytes": 22,
+      "sha256": "02cff2473bb0a02971b4d29a3f7f52587337f6292ed03eca500425c3b3b99bae"
+    },
+    {
+      "path": "evoagent/memory/context_manager.py",
+      "bytes": 43590,
+      "sha256": "e39068e59a73ad27a31ce6d736f23e64e569affeaefd8e414452054bb5e19b1a"
+    },
+    {
+      "path": "evoagent/memory/memory.py",
+      "bytes": 12776,
+      "sha256": "26d6baae32afaef3136263eb811d1c02636217f2cb645aafd73fda0adca5f981"
+    },
+    {
+      "path": "evoagent/memory/memory_experience_store.py",
+      "bytes": 5857,
+      "sha256": "810f3ef764298346fc67c5318ce1ea1453581ad460aae802f33ffef41e1057a9"
+    },
+    {
+      "path": "evoagent/memory/memory_governance.py",
+      "bytes": 5970,
+      "sha256": "7b7de4fb4d66675f057b8f770717532a530e4dc1ecc1a409b5882f58012f8cad"
+    },
+    {
+      "path": "evoagent/memory/memory_retrieval.py",
+      "bytes": 5646,
+      "sha256": "76f807c5a48956fdd415e700ed0063f57745f4c786ad26b1c64cfc0289a1dde4"
+    },
+    {
+      "path": "evoagent/repair/__init__.py",
+      "bytes": 22,
+      "sha256": "8d6a1f77633126699e2271325e639853207e16871a2c06edf6e8dc3ae1345490"
+    },
+    {
+      "path": "evoagent/repair/fixer.py",
+      "bytes": 8517,
+      "sha256": "afc47e6532c5d280027deb7c95fc542a475f112afb27a346e883564f3504dc25"
+    },
+    {
+      "path": "evoagent/repair/patching.py",
+      "bytes": 10807,
+      "sha256": "64dceaa2cc123f14f0d8386b954b8e9440aed04b3deddb262cab1e6898eb99c5"
+    },
+    {
+      "path": "evoagent/repair/verifier.py",
+      "bytes": 6236,
+      "sha256": "4c9e2590e9e831f360ac1960a03125aff914412dbaab077d2a5ae1d0f7697fcd"
+    },
+    {
+      "path": "evoagent/runtime/__init__.py",
+      "bytes": 23,
+      "sha256": "8b1fd2beb905c80ff85e3140988a493000e6b7b162eba55abdf68694220f4fda"
+    },
+    {
+      "path": "evoagent/runtime/artifacts.py",
+      "bytes": 4001,
+      "sha256": "b9007d8efd3998368da2a1f9ad67f5583548a4e5f93c7aefbf026673d7103e5c"
+    },
+    {
+      "path": "evoagent/runtime/evidence.py",
+      "bytes": 7354,
+      "sha256": "3658bfe8d9d3f8cad81aa61d9ce6e9afd9fa35f6d22061c679e4cecb639a7e06"
+    },
+    {
+      "path": "evoagent/runtime/goal_gate.py",
+      "bytes": 7196,
+      "sha256": "891002ab0dfbb7c5167a0498584fce7fa9a20f568ed6a8fbed310a27373e809c"
+    },
+    {
+      "path": "evoagent/runtime/harness.py",
+      "bytes": 19186,
+      "sha256": "34c9ee50e61696d39e4f836d6ab9b6c2e50e76cea3972580327067d745542a63"
+    },
+    {
+      "path": "evoagent/runtime/hooks.py",
+      "bytes": 8069,
+      "sha256": "fba566ab5ac6dc8b7c6b04088d82835df256614c2acd4f2d69899620559cfe1f"
+    },
+    {
+      "path": "evoagent/runtime/journal.py",
+      "bytes": 2948,
+      "sha256": "e2f6bf15058d110898615dbfb04cd0b7edb0f09198f383ce08953c4c73f370c1"
+    },
+    {
+      "path": "evoagent/runtime/runtime.py",
+      "bytes": 21806,
+      "sha256": "32beb65dee784fe109fabdd71856ab7ce315be153c302126d60c6e121de55d09"
+    },
+    {
+      "path": "evoagent/skills/__init__.py",
+      "bytes": 22,
+      "sha256": "75d4a69306f6af84103e811700bfc36ca028e36d02110b2d98fea8bedd2753ea"
+    },
+    {
+      "path": "evoagent/skills/skill_evolution.py",
+      "bytes": 20982,
+      "sha256": "6d8098e4e3e7dc67f3712e0a60848cd3de382426b93cd19e5c2d62b08b75df1e"
+    },
+    {
+      "path": "evoagent/skills/skills.py",
+      "bytes": 12302,
+      "sha256": "0eb281649057e2da8c4ee0ea52f197051a85b82761698c6f1812dcc0716b6632"
+    },
+    {
+      "path": "evoagent/storage/__init__.py",
+      "bytes": 23,
+      "sha256": "5af0fa8b790dcb943de24681dc0237ab9351e22f75773626da5dae1f88854be9"
+    },
+    {
+      "path": "evoagent/storage/postgres_store.py",
+      "bytes": 68089,
+      "sha256": "6a17de08a9e613424056b3e2883a347eeedf09fc94361bb50d16e15d1da06e34"
+    },
+    {
+      "path": "evoagent/storage/store.py",
+      "bytes": 76060,
+      "sha256": "6f7d61c35647faccf1ff60224a6449314c1dfa4da22cfcf12d79d6f6fc6ad79e"
+    },
+    {
+      "path": "evolution-data/README.md",
+      "bytes": 668,
+      "sha256": "dc154ff50cdd1fd3dad433b6ea44ff8b5e6917fe5f35e577c4d81090804e62bf"
+    },
+    {
+      "path": "README.md",
+      "bytes": 10965,
+      "sha256": "1fa1d6bd727cceaf7ddea392c0850d7b6f412c22dfe34f85f3a0c9fb3c1d6503"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 148,
+      "sha256": "573fe69eea000791899a1566c5815f790fde380fb73af163b384112d90447f22"
+    },
+    {
+      "path": "scripts/__init__.py",
+      "bytes": 25,
+      "sha256": "01f27150a7cfe315106f23d62e51619c33a6057413cfc1162abece9341f4980b"
+    },
+    {
+      "path": "scripts/benchmarks/__init__.py",
+      "bytes": 26,
+      "sha256": "9c5f64152ef63af01c11da155f7bb1be39cc70446136377710f242dcfac66eb8"
+    },
+    {
+      "path": "scripts/benchmarks/benchmark_context_memory.py",
+      "bytes": 9046,
+      "sha256": "b876c5d19ef709a2a190d7afdf5a69e98be7b23aa83a82e758c7266909c792f2"
+    },
+    {
+      "path": "scripts/benchmarks/benchmark_runtime_harness.py",
+      "bytes": 7947,
+      "sha256": "8112a6ef4f1de08e510f7dfee6b22823d90e1a680bb6d65387729862008470cc"
+    },
+    {
+      "path": "scripts/evaluation/__init__.py",
+      "bytes": 26,
+      "sha256": "292ba13cac690f75cb29b6529b7ebc4bcc64d7164b3629043be07b863f333aea"
+    },
+    {
+      "path": "scripts/evaluation/import_github_pr_dataset.py",
+      "bytes": 4630,
+      "sha256": "2ba6abcab16f97239072d0d52b3edc6587cc4db4af440e7f05d4a4a1d58b652c"
+    },
+    {
+      "path": "scripts/evaluation/run_agentic_evaluation.py",
+      "bytes": 3106,
+      "sha256": "11eee0be8b14fff706aea68945a9407572c5dfb492bdf56cf753aeeb5e2cd945"
+    },
+    {
+      "path": "scripts/evaluation/run_prompt_evolution_proof.py",
+      "bytes": 1584,
+      "sha256": "e3817b80d05868b657dabcbd8d89873dc05cabb225edf3e126bddaae543e2f07"
+    },
+    {
+      "path": "scripts/evaluation/run_real_pr_benchmark.py",
+      "bytes": 924,
+      "sha256": "169b8cedeacb27fbf6fb660cef01b78fe38ce75d08166910297dd9a73d752278"
+    },
+    {
+      "path": "scripts/maintenance/__init__.py",
+      "bytes": 40,
+      "sha256": "f0d9d35463a185a9250f9e2c26a47df11a0f6a95b393825c9e9fdcc6d97d7c8c"
+    },
+    {
+      "path": "scripts/maintenance/check_layout.py",
+      "bytes": 3910,
+      "sha256": "a6fc2fe75c99db0ed70398d7680d454020a8956a4084fe31799e0ab13aa3586c"
+    },
+    {
+      "path": "scripts/maintenance/export_github.py",
+      "bytes": 4373,
+      "sha256": "f48ca864c3ff1bc6506fb7b9d058dc999abb6a1489563a9b3dbe888a6459541c"
+    },
+    {
+      "path": "skills/api-compatibility/SKILL.md",
+      "bytes": 1027,
+      "sha256": "56bc7ad9629916339959c53c37397b0f687e30b91406affcb3022edd3be78ed7"
+    },
+    {
+      "path": "skills/code-quality/SKILL.md",
+      "bytes": 761,
+      "sha256": "c585c35c09bdfdf1b3e2d1924db60f88a4e58994d5fc1d1ebf5c2e4f27fe89d1"
+    },
+    {
+      "path": "skills/correctness-review/SKILL.md",
+      "bytes": 973,
+      "sha256": "45148e640884eed4469c62755878928aaa41f2e97bbba423de564fa0863e9a84"
+    },
+    {
+      "path": "skills/database-review/SKILL.md",
+      "bytes": 1049,
+      "sha256": "066aead23b9f7efea85cc8617d29de6691f2368317d1e26ac6bc1f4cbe572a4d"
+    },
+    {
+      "path": "skills/observability-review/SKILL.md",
+      "bytes": 1001,
+      "sha256": "66290d730ec3b38d19415b55258b81c7ef516457d4a23439d7ed94478fc6e90c"
+    },
+    {
+      "path": "skills/performance-review/SKILL.md",
+      "bytes": 1082,
+      "sha256": "48d3be73b4f9446470a6f0cd444f654d225dcd17b80535eacdeaa35a9d984477"
+    },
+    {
+      "path": "skills/reliability-review/SKILL.md",
+      "bytes": 953,
+      "sha256": "2a38d522376c7d85bc270cfb5eabe8e5b179f27c99a8c315cb2c2b859edf9890"
+    },
+    {
+      "path": "skills/security-review/SKILL.md",
+      "bytes": 1100,
+      "sha256": "f1679dd2e69664a0b24f9f78d0f71226cbbd9b2e370681a1a5fd2110ac82c408"
+    },
+    {
+      "path": "skills/test-quality/SKILL.md",
+      "bytes": 999,
+      "sha256": "9650935fb9f97bdc742827ef391d07d9fc969c63a369274713ae7b7b3bd9d990"
+    },
+    {
+      "path": "tests/__init__.py",
+      "bytes": 23,
+      "sha256": "666c12766368513c929d981a15e1ec7197d673c6fbf7b4b84449523119b7a3a4"
+    },
+    {
+      "path": "tests/agents/__init__.py",
+      "bytes": 22,
+      "sha256": "25f1fe8d1d9866d7fbfe0a7deb070aed55ec860f5e65a0a9d0b4236acd376791"
+    },
+    {
+      "path": "tests/agents/test_lead_worker_collaboration.py",
+      "bytes": 7110,
+      "sha256": "b2da05d4fac44a4dbf367b221938e0f4e207d455183003110fc791fcc586655b"
+    },
+    {
+      "path": "tests/agents/test_reviewer.py",
+      "bytes": 704,
+      "sha256": "6a1bcf9ea902665af2307cb51087574cca098b8df3c4bf0a6c528291f302f689"
+    },
+    {
+      "path": "tests/application/__init__.py",
+      "bytes": 27,
+      "sha256": "8514a7f4d89ad725646ae4f14b28760bea128206a81031c86ba63c4f95cfb106"
+    },
+    {
+      "path": "tests/application/test_advanced.py",
+      "bytes": 13171,
+      "sha256": "48957b92e7d2c5779d596f5183b75d28c45c8ce1a301eec7b42877db0b6e5eae"
+    },
+    {
+      "path": "tests/application/test_phases_0_5.py",
+      "bytes": 8332,
+      "sha256": "e754c90f08f71b8b6cea0bc4d3eb933aa5d2edeaa50391f477c82743fbbd29ea"
+    },
+    {
+      "path": "tests/application/test_production_features.py",
+      "bytes": 5519,
+      "sha256": "946cb80c152966f8718ce29ae810777026773d6e484023aa9a58395f599e474d"
+    },
+    {
+      "path": "tests/application/test_service.py",
+      "bytes": 2772,
+      "sha256": "60c6f91e99f7ab52dd35a210215598e9c06b277a6818123be4719f30d1fea571"
+    },
+    {
+      "path": "tests/core/__init__.py",
+      "bytes": 20,
+      "sha256": "69063ebe47c670cd5d9f3a3335879af67ac8567fb76fe1af8bdf84e6079b9ae1"
+    },
+    {
+      "path": "tests/core/test_config.py",
+      "bytes": 1412,
+      "sha256": "5a71124656d1b4f22fac469e0a59c8b959381289a2c36ff13e62083dc4588482"
+    },
+    {
+      "path": "tests/core/test_diff_parser.py",
+      "bytes": 633,
+      "sha256": "2a29e89e8b36f35c5bb7c2cef01c533f24b7a3c4b4b67eed5b8dfae1212c7c07"
+    },
+    {
+      "path": "tests/evaluation/__init__.py",
+      "bytes": 26,
+      "sha256": "292ba13cac690f75cb29b6529b7ebc4bcc64d7164b3629043be07b863f333aea"
+    },
+    {
+      "path": "tests/evaluation/test_agentic_evaluation.py",
+      "bytes": 5411,
+      "sha256": "f630f383c94f1f6b78e151af1139c544c1c0258d4d960b5e6da6697eec558a20"
+    },
+    {
+      "path": "tests/evaluation/test_evaluation_harness.py",
+      "bytes": 2531,
+      "sha256": "66a670d831eea9a429d4a052532c575232b73008984e1afbd6f49f8c7324c8b8"
+    },
+    {
+      "path": "tests/evolution/__init__.py",
+      "bytes": 25,
+      "sha256": "0078bde24f8bd93ddf170d4ba37a412ca41f7983f6ddee712aaea1e84b6d2934"
+    },
+    {
+      "path": "tests/evolution/test_evolution_api.py",
+      "bytes": 5749,
+      "sha256": "456e1a01cf78acc42edd6def6b7df11f5adbb0e5953619837fdc3f38a1d99154"
+    },
+    {
+      "path": "tests/evolution/test_evolution_governance.py",
+      "bytes": 25262,
+      "sha256": "e211b2a47d7766be5848529e2f2c7eca91108a0fd9ce383119839204ac6abd8c"
+    },
+    {
+      "path": "tests/evolution/test_evolution_lease.py",
+      "bytes": 3389,
+      "sha256": "d49063fe3447c45b7ae957dd71d3ccd981c6d74b5219ed1912ea1b599660ed7d"
+    },
+    {
+      "path": "tests/evolution/test_evolution_monitor.py",
+      "bytes": 5552,
+      "sha256": "7ac2352a412c858a29c424ae3e6b2c5d918fd3c261ea259d3bb7c3b9147d6f39"
+    },
+    {
+      "path": "tests/evolution/test_evolution_postgres.py",
+      "bytes": 4966,
+      "sha256": "8fc7ba56cf05ff09c88d54f6d7d237df9e1ad6afff25cece503002edcbfef4e9"
+    },
+    {
+      "path": "tests/evolution/test_evolution_proof.py",
+      "bytes": 1825,
+      "sha256": "ad54cb90bb755acaaec72343f053bcf8677db0ce85413d92583872abbbab8dfc"
+    },
+    {
+      "path": "tests/integrations/__init__.py",
+      "bytes": 28,
+      "sha256": "24ac984ad9793e8131e53d0f051edcfd26e7a962178ac3e9e0f19a0b73e184f6"
+    },
+    {
+      "path": "tests/integrations/test_github.py",
+      "bytes": 516,
+      "sha256": "6e755cf9ad98c9bce9bc6b7f46aa28526be868856a0d8d74179493bc461af47e"
+    },
+    {
+      "path": "tests/memory/__init__.py",
+      "bytes": 22,
+      "sha256": "02cff2473bb0a02971b4d29a3f7f52587337f6292ed03eca500425c3b3b99bae"
+    },
+    {
+      "path": "tests/memory/test_context_manager.py",
+      "bytes": 7549,
+      "sha256": "518528226749a32553bfc7e0f88e3e2fd11508696818569331a67da079d38dc4"
+    },
+    {
+      "path": "tests/memory/test_context_memory_v2.py",
+      "bytes": 10054,
+      "sha256": "fa58c038564251aab9ac55149f6d7a351606f23c8fbd261fb683ce96cf69f204"
+    },
+    {
+      "path": "tests/memory/test_memory_experience.py",
+      "bytes": 6215,
+      "sha256": "96ecd1b8733eb8bae7653775da98cc17912cda8589f721507e959b0d938f6843"
+    },
+    {
+      "path": "tests/runtime/__init__.py",
+      "bytes": 23,
+      "sha256": "8b1fd2beb905c80ff85e3140988a493000e6b7b162eba55abdf68694220f4fda"
+    },
+    {
+      "path": "tests/runtime/test_harness.py",
+      "bytes": 1483,
+      "sha256": "dd12c5f53641035d39e5989a8654ab5170055b43c4fc764d9e2575dc84df96f6"
+    },
+    {
+      "path": "tests/runtime/test_runtime_harness_v2.py",
+      "bytes": 14283,
+      "sha256": "8d1b6ce30fe4275b301f25a1da615c54a6b228f175978bc16533367c49be5a92"
+    },
+    {
+      "path": "tests/runtime/test_runtime_memory_context.py",
+      "bytes": 7591,
+      "sha256": "6e627fb57361c2ea9f894c9a8feaaa5bc886e99877c27e27d6f5df25b690475a"
+    },
+    {
+      "path": "tests/skills/__init__.py",
+      "bytes": 22,
+      "sha256": "75d4a69306f6af84103e811700bfc36ca028e36d02110b2d98fea8bedd2753ea"
+    },
+    {
+      "path": "tests/skills/test_skill_evolution.py",
+      "bytes": 11314,
+      "sha256": "9c0ef9575797cc6aad9a6dcea36ce27d1d973624f2b9b0537dd937ced34e7cf4"
+    },
+    {
+      "path": "tests/support/__init__.py",
+      "bytes": 23,
+      "sha256": "8d899b4338b7034e7104ebb57ababdc8e400ddfc01a5adf8976b2a6ce8aee1ec"
+    },
+    {
+      "path": "tests/support/agentic_fake.py",
+      "bytes": 3778,
+      "sha256": "89c79dad736abed56e050c1865d8cc8eb75fa3f29e80de8a8591f27ecb790cf1"
+    },
+    {
+      "path": "tests/ui/__init__.py",
+      "bytes": 18,
+      "sha256": "ffbd4780ea2075a0c41f60edb71c43575b6bc8a37ee0d0f4ae3c83afc6dbdff7"
+    },
+    {
+      "path": "tests/ui/evolution_ui.cjs",
+      "bytes": 6923,
+      "sha256": "be4dc0b43cd748153e082384181e3dd2a08045600f1405fbe524f7aa2c5005a5"
+    },
+    {
+      "path": "web/app.css",
+      "bytes": 31841,
+      "sha256": "9a84e1340d50045f977d036c32556aa5aeddc86d4ebea77798760244a2e7614c"
+    },
+    {
+      "path": "web/app.js",
+      "bytes": 27101,
+      "sha256": "4ee112d8a58bebf3792e61ff39df612c35d83b151e0f6735769f174793509e25"
+    },
+    {
+      "path": "web/index.html",
+      "bytes": 15658,
+      "sha256": "0bc3eb790cb73887abdda859bcd8011f696aff0b1882cb434014606fed97b5b4"
+    },
+    {
+      "path": "web/login.css",
+      "bytes": 1031,
+      "sha256": "cca1b3564fa0ba69016e27d3d66c431306ce7731d62a0f899350cbe46e062ee4"
+    }
+  ]
+}
