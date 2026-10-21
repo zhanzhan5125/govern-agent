@@ -424,6 +424,18 @@ class ApiHandler(BaseHTTPRequestHandler):
                     return
                 self._send_json(200, result)
                 return
+            if path == '/v1/govern/policy/manual':
+                principal = self._principal('manage')
+                if self.client_address[0] not in {'127.0.0.1','::1'}:
+                    raise PermissionError('策略文件修改仅支持本机管理员')
+                from govern.policy.bundle import save_manual_rule
+                payload = self._read_json(body)
+                with self.service.govern.lock:
+                    updated = save_manual_rule(payload.get('section'),payload.get('content'),payload.get('expected_source_sha256'))
+                    self.service.store.audit(principal.tenant_id,principal.username,'policy.manual',
+                        str(payload.get('section')),{'source_sha256':updated['source_sha256']})
+                    self._send_json(200,self.service.govern.active_policy(principal.tenant_id))
+                return
             if path == "/v1/govern/reviews":
                 principal = self._principal("review")
                 self._send_json(202, self.service.govern.create(self._read_json(body), principal.tenant_id))

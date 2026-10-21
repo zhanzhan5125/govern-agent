@@ -11,7 +11,7 @@ import threading
 import uuid
 from govern.runtime.pi_bridge import PiBridge
 from govern.integrations.atlassian import adapter
-from govern.policy.bundle import compile_bundle, render_report, ROLES
+from govern.policy.bundle import compile_bundle, render_report, select_fragments, ROLES
 from .repository import capture, change_units, describe, digest, git, safe_path
 from govern.runtime.verification import VerificationGateway, ExecutionProfile
 from govern.core.models import TraceEvent, TaskState
@@ -43,7 +43,7 @@ class GovernWorkbench:
         if head["candidate_id"]:
             candidate = self.store.get_evolution_candidate(head["candidate_id"], tenant)
             return compile_bundle(overrides(candidate["content"]))
-        return self.bundle
+        return compile_bundle(self.config.get("policy_overrides"))
 
     def model_identity(self):
         model = self.service.llm_config or {}
@@ -69,7 +69,7 @@ class GovernWorkbench:
         frozen = {"snapshot_ref":self.artifacts.put(task,tenant,"code-snapshot",snapshot).uri,
             "requirements_ref":self.artifacts.put(task,tenant,"requirement-snapshot",case.get("requirements",[])).uri,
             "policy_ref":self.artifacts.put(task,tenant,"policy-snapshot",policy).uri,
-            "units":change_units(snapshot),"model_identity":self.model_identity(),"execution_identity":self.execution_identity(),
+            "units":[select_fragments(u,policy) for u in change_units(snapshot)],"model_identity":self.model_identity(),"execution_identity":self.execution_identity(),
             "coverage":{"benchmark_context":"frozen-files" if snapshot["head_files"] else "diff-only","omitted_files":[]}}
         self.store.save_checkpoint(task,"govern-input",frozen,"completed")
         self.store.save_task_payload(task,case["diff"])
@@ -107,7 +107,7 @@ class GovernWorkbench:
         snapshot_ref = self.artifacts.put(task, tenant, "code-snapshot", snapshot)
         req_ref = self.artifacts.put(task, tenant, "requirement-snapshot", requirements)
         policy_ref = self.artifacts.put(task, tenant, "policy-snapshot", bundle)
-        units = change_units(snapshot)
+        units = [select_fragments(u,bundle) for u in change_units(snapshot)]
         refs = {"snapshot_ref": snapshot_ref.uri, "requirements_ref": req_ref.uri, "policy_ref": policy_ref.uri,
                 "units": units, "model_identity": self.model_identity(), "execution_identity":self.execution_identity(), "coverage": {"change_units": len(units), "omitted_files": snapshot["omitted_files"],
                     "business_conformity": "selected-requirements-only" if requirements else "unverified"}}

@@ -70,7 +70,7 @@ govern-agent/
 │   └── maintenance/          # 布局检查与干净副本导出
 ├── data/benchmarks/          # 公开受控 PR Diff 样本
 ├── evolution-data/           # 外部评测数据挂载入口，仅跟踪说明文件
-├── skills/                   # Skill 资源，与 Python skills 子包不同
+├── policies/                 # govern-review 为 Pi 策略源；legacy-skills 仅用于兼容流程
 ├── web/                      # 管理台静态资源
 ├── docs/
 │   ├── project/              # 项目长文与原始 PDF

@@ -1,0 +1,9 @@
+{
+  "version": "govern-2",
+  "fragments": {
+    "database": {"file": "fragments/database.md", "roles": ["correctness", "contract_test"], "path_patterns": ["migration", "schema", "models", "repository", "persistence", "\\.sql$"], "code_patterns": ["\\b(SELECT|INSERT|UPDATE|DELETE|ALTER TABLE|CREATE TABLE)\\b", "\\b(transaction|commit|rollback)\\b"]},
+    "concurrency": {"file": "fragments/concurrency.md", "roles": ["correctness"], "path_patterns": ["queue", "worker", "lock"], "code_patterns": ["\\b(async|await|threading|Lock|Semaphore|gather|create_task|Promise\\.all)\\b"]},
+    "api_compatibility": {"file": "fragments/api-compatibility.md", "roles": ["contract_test", "security"], "path_patterns": ["(^|/)(api|routes|controllers)/", "openapi", "proto", "graphql"], "code_patterns": ["\\b(APIRouter|FastAPI|BaseHTTPRequestHandler|app\\.(get|post|put|delete)|router\\.)"]},
+    "migration": {"file": "fragments/migration.md", "roles": ["correctness", "contract_test"], "path_patterns": ["migration", "alembic"], "code_patterns": ["\\b(ALTER TABLE|DROP TABLE|ADD COLUMN|DROP COLUMN)\\b"]}
+  }
+}

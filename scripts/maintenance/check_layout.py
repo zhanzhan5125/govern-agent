@@ -51,7 +51,8 @@ def main():
     except Exception as exc:
         failures.append(f'resource: cannot resolve WEB_ROOT: {exc}')
     for relative in ('web/index.html', 'web/app.js', 'web/app.css', 'web/login.css',
-                     'data/benchmarks/pr_diff_100.jsonl', 'skills/security-review/SKILL.md'):
+                     'data/benchmarks/pr_diff_100.jsonl', 'policies/legacy-skills/security-review/SKILL.md',
+                     'policies/govern-review/manifest.json', 'policies/govern-review/common/evidence.md'):
         if not (ROOT / relative).is_file():
             failures.append(f'resource: missing {relative}')
 

@@ -48,6 +48,12 @@ export class GovernRuntime {
     const previous=this.request.checkpoints?.[id];
     if(previous&&depth===0){this.host.event({event:'checkpoint_reused',role,stage_id:id});return previous;}
     this.budget.check();
+    const fragmentIds:string[]=depth?[]:(input.unit?.policy_fragments?.[role]||[]);
+    const fragments=fragmentIds.map(name=>{
+      const spec=this.request.policy.specialist_fragments?.[name];
+      if(!spec||!spec.roles.includes(role))throw Error('unauthorized specialist fragment');
+      return `\n\nSpecialist fragment [${name}]:\n${spec.content}`;
+    }).join('');
     const folder=await mkdtemp(join(tmpdir(),'govern-pi-'));
     const settings=SettingsManager.inMemory({compaction:{enabled:false},retry:{enabled:false},cacheWarming:{enabled:false}} as any);
     const mr=await ModelRuntime.create({authPath:join(folder,'auth.json'),modelsPath:null,refreshOnCreate:false});
@@ -55,7 +61,7 @@ export class GovernRuntime {
       headers:this.request.model.headers||{},models:[{id:this.request.model.model,name:this.request.model.model,reasoning:false,input:['text'],
       cost:{input:0,output:0,cacheRead:0,cacheWrite:0},contextWindow:32768,maxTokens:2048}]});
     const loader=new DefaultResourceLoader({cwd:folder,agentDir:folder,settingsManager:settings,noExtensions:true,noSkills:true,
-      noPromptTemplates:true,noThemes:true,noContextFiles:true,systemPrompt:this.request.policy.stages[role]+
+      noPromptTemplates:true,noThemes:true,noContextFiles:true,systemPrompt:this.request.policy.stages[role]+fragments+
       (depth?'\nChild: no delegation/execution. Return JSON {status: completed|partial|failed, evidence_refs: [], facts: [], limitations: []}. State partial or failed honestly.':'')});
     await loader.reload();
     const definitions:ToolDefinition[]=[];
@@ -86,7 +92,8 @@ export class GovernRuntime {
         return {status:result.status,result};
       }finally{this.childCount--;}
     });
-    this.host.event({event:'stage_start',role,stage_id:id,depth,budget:this.budgetSnapshot(),policy_sha256:this.request.policy.sha256});
+    this.host.event({event:'stage_start',role,stage_id:id,depth,budget:this.budgetSnapshot(),policy_sha256:this.request.policy.sha256,
+      specialist_fragments:fragmentIds,fragment_selection_reasons:input.unit?.fragment_selection_reasons||{}});
     let session:Awaited<ReturnType<typeof createAgentSession>>['session']|undefined;
     let lastStreamEvent=0,outputChars=0;
     try{

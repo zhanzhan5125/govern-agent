@@ -10,7 +10,7 @@ import shutil
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-PUBLIC_DIRS = ('src', 'tests', 'scripts', 'docs', 'data', 'skills', 'web', 'frontend', 'pi-runtime')
+PUBLIC_DIRS = ('src', 'tests', 'scripts', 'docs', 'data', 'policies', 'web', 'frontend', 'pi-runtime')
 PUBLIC_FILES = ('README.md', 'requirements.txt', 'Dockerfile', 'docker-compose.yml',
                 '.env.example', '.gitignore', '.dockerignore', 'evolution-data/README.md',
                 'pyproject.toml', 'GOVERN_IMPLEMENTATION.md', 'THIRD_PARTY_NOTICES.md')

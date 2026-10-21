@@ -59,12 +59,34 @@ $env:EVOAGENT_LLM_MODEL = 'your-model'
 
 ## 代码结构与执行契约
 
+### 统一策略目录与进化权限
+
+`policies/govern-review/` 是新版 Pi 审查唯一的磁盘策略源：`common/evidence.md`、
+`common/risk.md`、六份 `stages/*.md`、`contracts/finding.md` 和四类 `fragments/*.md`。
+公共规则适用于全部阶段；完整风险规则和 Finding 契约只注入产生/核验 Finding 的五个阶段，
+Mapper 使用自己的映射输出契约。风险等级不控制基础审查覆盖。
+
+进化候选仅保存某一个被归因阶段的补充指导；入口文件和另外五个阶段必须与活动基线一致。
+公共规则、风险、契约、专项片段和路由清单不在候选可写范围，通用进化入口不能绕过此限制。
+人工修改策略源后，未发布候选的源哈希不匹配，必须重新生成和评测；已冻结运行保持原文。
+策略中心区分公共/风险规则、阶段基础文件、活动进化补充指导、有效指令及专项片段。
+本机管理员可通过带源哈希并发校验的人工编辑接口修改公共/风险规则，产生审计记录，
+影响所有租户之后的新运行。只读部署应编辑受信源文件后重新部署。
+
+旧 Skill 完整迁移至 `policies/legacy-skills/`，仅用于兼容 Lead/Worker；新版没有读取整个旧目录。
+数据库、并发、API 兼容、迁移片段按冻结 ChangeUnit 的路径/代码词法信号选择，
+仅注入授权角色，选择原因进入 Trace；这不是精确语义分类，也不会跳过三个基础领域。
+
+本轮验证：Python 166 项（154 通过、12 条件跳过，包含 4 项真实 Docker 合成验证），
+Pi 7 项通过，TypeScript 类型检查、Vue 构建及目录/导入/脚本检查通过。
+人工编辑接口通过临时策略副本测试；没有为验收改写真实公共/风险规则，没有调用外部模型。
+
 ### src 布局整合（2026-10-21）
 
 Python 源码统一放在 `src/govern`，不保留 `EvoAgent/` 或旧包名导入桥接。
 原审查角色与仓库分析并入 `review`；HTTP 服务并入 `api`；策略片段及候选治理并入 `policy`；
 Pi 桥接及运行验证并入 `runtime`；Jira MCP 并入 `integrations`。
-`skills/` 只保留 Markdown 策略资源，加载器代码位于 `src/govern/skills`。
+策略资源统一位于 `policies/`，加载器代码位于 `src/govern/skills`；旧目录迁移至 `policies/legacy-skills`。
 
 启动脚本、editable 安装、Docker 源码挂载、维护与评测脚本均已适配。
 资源根目录由 `govern.core.paths.project_root()` 统一解析，部署时可用 `GOVERN_ROOT` 指定；

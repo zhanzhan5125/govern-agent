@@ -85,7 +85,7 @@ class Settings:
     memory_enabled: bool = True
     memory_recall_limit: int = 6
     memory_working_ttl_seconds: int = 86400
-    skills_dir: str = "skills"
+    skills_dir: str = str(resource_root() / "policies/legacy-skills")
     github_app_id: str = ""
     github_app_slug: str = ""
     github_private_key_path: str = ""
@@ -256,7 +256,7 @@ class Settings:
             memory_working_ttl_seconds=_int(
                 "EVOAGENT_MEMORY_WORKING_TTL_SECONDS", 86400
             ),
-            skills_dir=os.getenv("EVOAGENT_SKILLS_DIR", "skills"),
+            skills_dir=os.getenv("EVOAGENT_SKILLS_DIR", str(resource_root() / "policies/legacy-skills")),
             github_app_id=os.getenv("EVOAGENT_GITHUB_APP_ID", ""),
             github_app_slug=os.getenv("EVOAGENT_GITHUB_APP_SLUG", ""),
             github_private_key_path=os.getenv("EVOAGENT_GITHUB_PRIVATE_KEY_PATH", ""),

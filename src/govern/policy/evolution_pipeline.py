@@ -91,6 +91,8 @@ class EvolutionPipeline:
         )) for path in sorted(set(before) | set(after)))
 
     def propose(self, tenant_id, kind, name, content, actor, lineage=None):
+        if name == "govern-review" and not getattr(self, "govern_stage_only", False):
+            raise ValueError("govern-review candidates require the stage-scoped governance pipeline")
         if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]{0,119}", name):
             raise ValueError("invalid candidate name")
         normalized = self._normalize(kind, name, content)
@@ -125,6 +127,7 @@ class EvolutionPipeline:
             replay = EvolutionReplay(self.reviewer_factory, self.policy)
             report = replay.compare(candidate["kind"], candidate["baseline"]["content"],
                                     candidate["content"], self.dataset.cases(phase), phase)
+            self._get(candidate_id, tenant_id, candidate["revision"])
             candidate = self.store.transition_evolution_candidate(candidate_id, tenant_id,
                 candidate["revision"], target if report["passed"] else "REJECTED", "verifier",
                 phase + (" replay passed" if report["passed"] else " replay failed"), report, lease_owner=owner)
@@ -160,6 +163,7 @@ class EvolutionPipeline:
         report = EvolutionReplay(self.reviewer_factory, self.policy).compare(
             candidate["kind"], candidate["baseline"]["content"], candidate["content"],
             self.dataset.cases("shadow"), "shadow")
+        self._get(candidate_id, tenant_id, candidate["revision"])
         report["production_ready"] = self.dataset.production_ready
         report["mode"] = "isolated-read-only-shadow-replay"
         return self.store.transition_evolution_candidate(candidate_id, tenant_id, expected_revision,

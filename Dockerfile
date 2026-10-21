@@ -8,7 +8,7 @@ COPY src ./src
 COPY pyproject.toml .
 RUN pip install --no-cache-dir --no-deps .
 COPY web ./web
-COPY skills ./skills
+COPY policies ./policies
 EXPOSE 8080
 CMD ["python", "-m", "govern"]
 

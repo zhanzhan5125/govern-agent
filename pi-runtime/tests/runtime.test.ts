@@ -63,11 +63,20 @@ test('real Pi AgentSessions execute all six stages through patched Core with iso
  const port=(server.address() as any).port;const events:any[]=[];
  const roles=['mapper','correctness','security','contract_test','synthesizer','validator'];
  const rt=new GovernRuntime({method:'run_review',model:{base_url:`http://127.0.0.1:${port}/v1`,api_key:'test-only',model:'test'},
-   policy:{sha256:'test',stages:Object.fromEntries(roles.map(r=>[r,`ROLE:${r}. Return only JSON.`]))},
-   input:{units:[{change_unit_id:'u1',path:'a.py',context:'x=1'}],requirements:[],business_profile:{},coverage:{},snapshot_id:'s1',verification_enabled:false}},
+   policy:{sha256:'test',stages:Object.fromEntries(roles.map(r=>[r,`ROLE:${r}. Return only JSON.`])),specialist_fragments:{database:{roles:['correctness'],content:'SPECIALIST_DATABASE'}}},
+   input:{units:[{change_unit_id:'u1',path:'a.py',context:'x=1',policy_fragments:{correctness:['database']},fragment_selection_reasons:{database:{precision:'lexical'}}}],requirements:[],business_profile:{},coverage:{},snapshot_id:'s1',verification_enabled:false}},
    {tool:async()=>{throw Error('unexpected tool')},event:e=>events.push(e)});
  try{const result=await rt.run();assert.deepEqual(result.findings,[]);assert.equal(prompts.length,6);
    assert.equal(events.filter(e=>e.event==='stage_complete').length,6);assert.equal(rt.budget.turns,6);
    for(const p of prompts)assert.equal(roles.filter(r=>p.includes('ROLE:'+r)).length,1);
+   assert.equal(prompts.filter(p=>p.includes('SPECIALIST_DATABASE')).length,1);
+   assert.ok(prompts.find(p=>p.includes('SPECIALIST_DATABASE'))?.includes('ROLE:correctness'));
+   assert.deepEqual(events.find(e=>e.event==='stage_start'&&e.role==='correctness').specialist_fragments,['database']);
  }finally{rt.cancel();server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));}
+});
+
+test('specialist fragment cannot be injected into an unauthorized role',async()=>{
+ const rt=new GovernRuntime({policy:{stages:{security:'Security'},specialist_fragments:{database:{roles:['correctness'],content:'DB'}}},input:{}},{tool:async()=>({}),event:()=>{}});
+ await assert.rejects(rt.stage('security','invalid',{unit:{policy_fragments:{security:['database']}}}),/unauthorized specialist/);
+ rt.cancel();
 });
