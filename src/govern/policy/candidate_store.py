@@ -18,6 +18,53 @@ def now():
 
 
 class CandidateStoreMixin(MemoryExperienceStoreMixin, EvolutionLeaseStoreMixin):
+    def auto_evolution_tenants(self):
+        with self._connect() as conn:
+            rows=conn.execute('SELECT DISTINCT t.tenant_id FROM tasks t JOIN failure_cases f ON f.task_id=t.id').fetchall()
+        return [r['tenant_id'] for r in rows]
+
+    def auto_evolution_state(self, tenant_id, value=None):
+        with self._candidate_transaction() as conn:
+            if value is not None:
+                self._candidate_execute(conn,'INSERT INTO govern_auto_evolution(tenant_id,state_json) VALUES (?,?) '
+                    'ON CONFLICT(tenant_id) DO UPDATE SET state_json=excluded.state_json',
+                    (tenant_id,json.dumps(value,ensure_ascii=False)))
+            row=self._candidate_execute(conn,'SELECT state_json FROM govern_auto_evolution WHERE tenant_id=?',(tenant_id,)).fetchone()
+        return json.loads(row['state_json']) if row else {}
+
+    def iter_feedback_failures(self, tenant_id, page_size=100):
+        """Keyset pages over existing failure storage; no recent-task window."""
+        before = None
+        while True:
+            sql = ('SELECT f.* FROM failure_cases f JOIN tasks t ON t.id=f.task_id '
+                   'WHERE t.tenant_id=?')
+            args = [tenant_id]
+            if before is not None:
+                sql += ' AND f.id<?'; args.append(before)
+            sql += ' ORDER BY f.id DESC LIMIT ?'; args.append(max(1,min(500,page_size)))
+            with self._connect() as conn:
+                rows = self._candidate_execute(conn,sql,args).fetchall()
+            if not rows:return
+            for row in rows:
+                value = dict(row); payload = value.pop('payload_json')
+                value['payload'] = json.loads(payload) if isinstance(payload,str) else payload
+                yield value
+            before = rows[-1]['id']
+
+    def evolution_feedback_links(self, tenant_id):
+        """Candidate lineage is the durable usage ledger, including terminal states."""
+        with self._connect() as conn:
+            rows = self._candidate_execute(conn,
+                'SELECT id,status,lineage_json FROM evolution_candidates '
+                'WHERE tenant_id=? AND name=? ORDER BY created_at,id',
+                (tenant_id,'govern-review')).fetchall()
+        links=[]
+        for row in rows:
+            lineage=json.loads(row['lineage_json'])
+            if lineage.get('source')=='live-feedback':
+                links.append({**lineage,'candidate_id':row['id'],'status':row['status']})
+        return links
+
     @property
     def _candidate_postgres(self):
         return hasattr(self, "psycopg")
@@ -41,6 +88,7 @@ class CandidateStoreMixin(MemoryExperienceStoreMixin, EvolutionLeaseStoreMixin):
 
     def _init_candidates(self):
         with self._candidate_transaction() as conn:
+            conn.execute('CREATE TABLE IF NOT EXISTS govern_auto_evolution (tenant_id TEXT PRIMARY KEY,state_json TEXT NOT NULL)')
             self._init_memory_experiences(conn)
             self._init_evolution_leases(conn)
             conn.execute("""CREATE TABLE IF NOT EXISTS evolution_candidates (

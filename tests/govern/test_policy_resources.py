@@ -131,6 +131,39 @@ class PolicyResourceTests(unittest.TestCase):
             service=SimpleNamespace(settings=settings,llm_config={}), verification=SimpleNamespace(profiles={}))
         return GovernEvolution(w)
 
+    def test_live_feedback_usage_survives_restart_and_rejection_allows_retry(self):
+        p=self.pipeline();store=p.store
+        store.create('feedback-run','live/repo',None,{'govern':True})
+        with store._connect() as conn:conn.execute("UPDATE tasks SET state='SUCCESS' WHERE id='feedback-run'")
+        finding={'finding_id':'F1','source_stage':'security','path':'a.py','line':1,'title':'Ownership'}
+        feedback={'feedback_id':'feedback-1','type':'false_positive','finding':finding,'source_stage':'security',
+                  'reason_code':'insufficient_evidence','reason':'Caller already enforces ownership'}
+        store.save_checkpoint('feedback-run','govern-feedback',{'history':[feedback]},'completed')
+        store.record_failure_case('feedback-run','false_positive',{'finding':finding,'feedback_id':'feedback-1'})
+        calls=[]
+        def run(*args):
+            calls.append(args)
+            return {'stage':'security','guidance':'Check upstream ownership evidence before reporting. Revision '+str(len(calls))}
+        p.workbench.service.llm_config={'model':'fake-test-only'}
+        p.workbench.bridge=SimpleNamespace(run=run)
+        generated=p.generate('default','tester')['candidates'][0]
+        self.assertEqual(['feedback-1'],generated['lineage']['feedback_ids'])
+        self.assertEqual(1,generated['lineage']['sampling']['selected'])
+        self.assertEqual(1,len(store.evolution_feedback_links('default')))
+        restarted=GovernEvolution(p.workbench)
+        self.assertEqual([],restarted.generate('default','tester')['candidates'])
+        self.assertEqual(1,len(calls))
+        p.reject(generated['id'],'default',generated['revision'],'tester','Need another strategy')
+        self.assertEqual(1,len(restarted.generate('default','tester')['candidates']))
+        self.assertEqual(2,len(calls))
+        self.assertEqual(1,len(list(store.iter_feedback_failures('default'))))
+
+    def test_live_generation_single_flight(self):
+        p=self.pipeline();p.generation_lock.acquire()
+        try:
+            with self.assertRaisesRegex(CandidateConflict,'already running'):p.generate('default','tester')
+        finally:p.generation_lock.release()
+
     def test_candidate_may_change_only_one_attributed_stage(self):
         p = self.pipeline()
         candidate = p.propose('default','skill','govern-review',skill({'security':'Check tenant ownership.'}),'tester',{'stage':'security'})

@@ -1,6 +1,7 @@
 {
   "model_prices": {},
   "evaluate_runtime": false,
+  "auto_evolution": {"enabled": false, "threshold": 10, "cooldown_minutes": 1440},
   "policy_overrides": {},
   "execution_profiles": {},
   "jira": {

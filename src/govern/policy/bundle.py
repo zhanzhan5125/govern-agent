@@ -151,13 +151,23 @@ def render_report(run_id, result):
         return str(value)
     lines = [f"# Govern Agent Review · {run_id}", "", "## 审查覆盖与限制", "", clean(result.get("coverage")), ""]
     for i, finding in enumerate(result.get("findings", []), 1):
+        tests = finding.get("related_tests") or []
+        if finding.get("test"):
+            tests = [*tests, {"kind": "proposed", "scenario": finding["test"], "execution_status": "not_run"}]
+        evidence = finding.get("evidence_refs") or []
+        if finding.get("evidence") or finding.get("call_chain"):
+            evidence = {"evidence_refs": evidence, "direct_evidence": finding.get("evidence"),
+                        "call_chain": finding.get("call_chain", [])}
         fields = {
-            "风险等级": clean(finding.get("business_priority")) + "；技术严重性：" + clean(finding.get("severity")),
-            "来源模块": finding.get("source_module"), "关联测试用例": finding.get("related_tests"),
+            "风险等级": (finding.get("business_priority") or "待确认") + "；技术严重性：" + clean(finding.get("severity"))
+                + "\n分级依据：" + clean(finding.get("priority_reason")) + "\n依据引用：" + clean(finding.get("priority_basis")),
+            "来源模块": finding.get("source_module"), "关联测试用例": tests,
             "风险位置": f"{finding.get('path', '?')}:{finding.get('line', '?')} ({finding.get('side', 'head')})",
             "问题描述": finding.get("description", finding.get("explanation")), "影响范围": finding.get("impact_scope"),
-            "修复建议": finding.get("recommendation", finding.get("fix")), "证据依据": finding.get("evidence_refs"),
-            "运行验证": {"verdict": finding.get("runtime_verdict", "not_applicable"), "refs": finding.get("verification_refs", []), "limitations": finding.get("limitations", [])},
+            "修复建议": finding.get("recommendation", finding.get("fix")), "证据依据": evidence,
+            "运行验证": {"static_verdict": finding.get("static_verdict"), "verdict": finding.get("runtime_verdict", "not_applicable"), "refs": finding.get("verification_refs", []), "limitations": finding.get("limitations", [])},
+            "追溯信息": {"source_stage": finding.get("source_stage"), "slice_id": finding.get("slice_id"),
+                         "rule_id": finding.get("rule_id"), "confidence": finding.get("confidence")},
         }
         lines += [f"## {finding.get('finding_id', i)} · {clean(finding.get('title'))}", ""]
         for key, value in fields.items():

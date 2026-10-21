@@ -188,6 +188,11 @@ class ApiHandler(BaseHTTPRequestHandler):
             except (ValueError, OSError) as exc:
                 self._send_json(400, {"error": str(exc)})
             return
+        if path == '/v1/govern/auto-evolution':
+            principal=self._authenticate_or_send('manage')
+            if principal is None:return
+            self._send_json(200,self.service.govern.auto_evolution.status(principal.tenant_id))
+            return
         if path == "/v1/govern/requirements":
             try:
                 self._send_json(200, self.service.govern.jira.requirements(query.get("epic", [""])[0]))
@@ -777,10 +782,12 @@ def run() -> None:
         "postgresql" if settings.database_url else "sqlite", service.queue.backend, service.reviewer.name
     ))
     try:
+        service.govern.auto_evolution.start()
         server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
+        service.govern.auto_evolution.close()
         service.queue.close()
         if service.govern.jira.client:
             service.govern.jira.client.close()

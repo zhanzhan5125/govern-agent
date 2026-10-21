@@ -19,7 +19,9 @@ class AtlassianJiraAdapter(JiraAdapter):
         resources=[]
         if 'getAccessibleAtlassianResources' in self.catalog:
             value=self.client.call('getAccessibleAtlassianResources',{})
+            if isinstance(value,dict) and 'data' in value:value=value['data']
             resources=value if isinstance(value,list) else value.get('resources',value.get('data',[]))
+            resources=[{**resource,'id':resource.get('id') or resource.get('cloudId')} for resource in resources]
         return {'connected':True,'tools':tools,'resources':resources,'missing_tools':sorted(missing),
                 'limitations':['部分必需工具不可用，请检查read/search/write scope与组织权限'] if missing else []}
 
@@ -39,7 +41,9 @@ class AtlassianJiraAdapter(JiraAdapter):
             if match:args[match]=value
         for key in schema.get('required',[]):
             if key not in args:raise ValueError(f'{name}需要参数{key}，当前官方适配无法推断；请检查Cloud ID、Bug类型ID或使用高级工具映射')
-        return self.client.call(name,args)
+        result=self.client.call(name,args)
+        # Rovo MCP V2 wraps successful operation results in a data envelope.
+        return result['data'] if isinstance(result,dict) and 'data' in result else result
 
     def _cloud(self):
         cloud=self.config.get('cloud_id')
@@ -48,7 +52,7 @@ class AtlassianJiraAdapter(JiraAdapter):
 
     def _call(self,operation,values):
         cloud=self._cloud()
-        if operation=='get_issue':return self._invoke('getJiraIssue',{'cloud_id':cloud,'key':values['issue_key']})
+        if operation=='get_issue':return self._invoke('getJiraIssue',{'cloud_id':cloud,'key':values['issue_key'],'view':'full'})
         if operation=='list_requirements':
             parent=values['parent_key']
             if not re.fullmatch(r'[A-Za-z][A-Za-z0-9_]*-\d+',parent):raise ValueError('请输入有效Jira Issue Key，例如PAY-100')
@@ -69,9 +73,10 @@ class AtlassianJiraAdapter(JiraAdapter):
         if existing.get('issues'):return {'issue':existing['issues'][0],'reused':True}
         description='Govern Review: '+run_id+'\n\n'+json.dumps(finding,ensure_ascii=False,indent=2)
         # Official schemas have changed over time; send only supported fields and validate required ones.
-        fields={'project':{'key':project},'issuetype':{'id':self.config['issue_type_id']} if self.config.get('issue_type_id') else {'name':'Bug'},
+        type_name=self.config.get('issue_type_name') or 'Bug'
+        fields={'project':{'key':project},'issuetype':{'id':self.config['issue_type_id']} if self.config.get('issue_type_id') else {'name':type_name},
             'summary':finding['title'],'description':{'type':'doc','version':1,'content':[{'type':'paragraph','content':[{'type':'text','text':description}]}]},'labels':[marker]}
-        result=self._invoke('createJiraIssue',{'cloud_id':self._cloud(),'project':project,'type':'Bug','type_id':self.config.get('issue_type_id'),
+        result=self._invoke('createJiraIssue',{'cloud_id':self._cloud(),'project':project,'type':type_name,'type_id':self.config.get('issue_type_id'),
             'summary':finding['title'],'description':description,'additional':{'labels':[marker]},'fields':fields})
         return {'issue':result,'reused':False,'marker':marker}
 

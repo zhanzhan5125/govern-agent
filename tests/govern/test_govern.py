@@ -12,6 +12,18 @@ from govern.storage.store import TaskStore
 
 
 class GovernTests(unittest.TestCase):
+    def test_report_retains_legacy_evidence_without_claiming_test_execution(self):
+        finding={'title':'Stale grade','path':'submission.py','line':2,'severity':'high',
+                 'explanation':'Old grade survives resubmission','fix':'Invalidate old grade',
+                 'test':'Resubmit v2 after grading v1','evidence':'grade_id is reused',
+                 'call_chain':[{'path':'submission.py','line':2}],'priority_reason':'No business profile'}
+        report=render_report('test',{'findings':[finding]})
+        for label in ['风险等级','来源模块','关联测试用例','风险位置','问题描述','影响范围','修复建议','证据依据']:
+            self.assertIn('### '+label,report)
+        for text in ['待确认','Old grade survives resubmission','Invalidate old grade','grade_id is reused','proposed','not_run','call_chain']:
+            self.assertIn(text,report)
+        self.assertNotIn('related_tests',finding)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(); self.root = Path(self.temp.name)
     def tearDown(self): self.temp.cleanup()

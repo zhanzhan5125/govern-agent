@@ -36,6 +36,8 @@ class GovernWorkbench:
         self.lock = threading.RLock()
         from govern.policy.feedback_evolution import GovernEvolution
         self.evolution = GovernEvolution(self)
+        from govern.policy.auto_evolution import AutomaticEvolution
+        self.auto_evolution = AutomaticEvolution(self)
 
     def active_policy(self, tenant):
         from govern.policy.feedback_evolution import overrides
@@ -323,6 +325,7 @@ class GovernWorkbench:
             state["history"].append(record)
             self.store.save_checkpoint(task, "govern-feedback", state, "completed")
             self.store.record_failure_case(task, kind, {"finding": record["finding"], "note": record["reason"], "feedback_id": record["feedback_id"], "reason_code": record["reason_code"]})
+            if getattr(self,'auto_evolution',None):self.auto_evolution.wake.set()
             if kind == "accepted" and payload.get("create_bug"):
                 try:
                     effect = self.service.effects.execute_once(task, "govern-jira-bug", {"finding_id": finding["finding_id"]}, lambda: self.jira.create_bug(finding, task), node="feedback", role="user")

@@ -1,12 +1,24 @@
 """Small standard MCP client and explicitly mapped Jira operations. Configuration is server-owned."""
 import json
 import os
+import re
 import queue
 import subprocess
 import threading
 import urllib.request
 import uuid
+from http.client import IncompleteRead
 from govern.review.repository import digest
+
+
+def jira_text(value):
+    """Render Jira ADF as text without interpreting document content as instructions."""
+    if isinstance(value,str):return value
+    if isinstance(value,list):return ''.join(jira_text(x) for x in value)
+    if not isinstance(value,dict):return ''
+    if value.get('type')=='hardBreak':return '\n'
+    text=value.get('text','')+jira_text(value.get('content',[]))
+    return text+('\n' if value.get('type') in {'paragraph','heading','listItem','blockquote'} else '')
 
 
 class McpClient:
@@ -16,6 +28,19 @@ class McpClient:
         self.lock = threading.RLock(); self.responses = queue.Queue()
 
     def _request(self, method, params=None, notification=False):
+        # Retry transport interruptions only for idempotent reads/handshake.
+        # Never replay create/edit tools: an interrupted write may have succeeded.
+        readonly = method in {'initialize','tools/list'} or (
+            method == 'tools/call' and (params or {}).get('name') in {
+                'getAccessibleAtlassianResources','getJiraIssue','searchJiraIssuesUsingJql'})
+        for attempt in range(3 if readonly and not notification else 1):
+            try:return self._request_once(method,params,notification)
+            except (IncompleteRead,TimeoutError,urllib.error.URLError):
+                if not readonly or notification or attempt == 2:raise
+            except ValueError as exc:
+                if not readonly or notification or attempt == 2 or 'MCP SSE' not in str(exc):raise
+
+    def _request_once(self, method, params=None, notification=False):
         self.counter += 1
         message = {"jsonrpc": "2.0", "method": method, "params": params or {}}
         if not notification: message["id"] = self.counter
@@ -111,14 +136,18 @@ class JiraAdapter:
         value = self._call("get_issue", {"issue_key": key})
         issue = value.get("issue", value)
         fields = issue.get("fields", issue)
-        text = fields.get("description", "")
-        if not isinstance(text, str): text = json.dumps(text, ensure_ascii=False)
+        text = jira_text(fields.get("description", ""))
         criteria = fields.get(self.config.get("acceptance_field", "acceptance_criteria"), []) or []
         if isinstance(criteria, str): criteria = [x.strip(" -") for x in criteria.splitlines() if x.strip()]
-        elif isinstance(criteria,dict): criteria = [json.dumps(criteria,ensure_ascii=False)]
+        elif isinstance(criteria,dict): criteria = [x.strip() for x in jira_text(criteria).splitlines() if x.strip()]
+        criteria_source = self.config.get("acceptance_field", "acceptance_criteria")
+        if not criteria:
+            criteria = [x.strip() for x in text.splitlines() if re.match(r'^\s*AC[-_A-Za-z0-9]*\s*[:：]',x,re.I)]
+            criteria_source = 'description:explicit-AC-lines' if criteria else 'not_provided'
         result = {"requirement_id": issue.get("key", key), "title": fields.get("summary", ""), "description": text,
                   "acceptance_criteria": [{"criterion_id": f"{key}:AC-{i+1}", "text": str(c)} for i, c in enumerate(criteria)],
-                  "updated": fields.get("updated"), "limitations": ["External links are not fetched unless provided by configured MCP reader."]}
+                  "updated": fields.get("updated"), "criteria_source":criteria_source,
+                  "limitations": ["External links are not fetched unless provided by configured MCP reader."]}
         result["sha256"] = digest(result)
         old = self.cache.get(key)
         if old and old["sha256"] == result["sha256"]: return old

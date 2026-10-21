@@ -1,6 +1,7 @@
 <script setup>
 import {ref,watch} from 'vue';
 import {api} from './api.js';
+import AutoEvolution from './AutoEvolution.vue';
 const props=defineProps({policy:{type:Object,required:true}}),emit=defineEmits(['saved']);
 const editing=ref(''),draft=ref(''),busy=ref(false),error=ref('');
 const editVersion=ref({});
@@ -15,6 +16,7 @@ async function save(){
 }
 </script>
 <template>
+  <AutoEvolution/>
   <section class="card"><h2>公共规则与风险规则</h2><p class="muted">不参与自进化。仅本机管理员可人工修改；每次审查冻结当时版本。修改后旧候选须重新生成和评测。</p>
     <div v-for="section in ['common','risk']" :key="section" class="policy-fragment">
       <div class="section-heading"><h3>{{section==='common'?'公共证据规则':'风险等级规则'}}</h3><button class="button secondary" :disabled="busy" @click="edit(section)">人工编辑{{section==='common'?'公共规则':'风险规则'}}</button></div>
