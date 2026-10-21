@@ -1,0 +1,8 @@
+{
+  "mapper": [],
+  "correctness": ["read_file", "search_code", "delegate_evidence"],
+  "security": ["read_file", "search_code", "delegate_evidence"],
+  "contract_test": ["read_file", "search_code", "delegate_evidence"],
+  "synthesizer": [],
+  "validator": ["read_file", "search_code", "delegate_evidence", "write_verification_artifact", "run_verification"]
+}

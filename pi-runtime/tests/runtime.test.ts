@@ -22,13 +22,14 @@ test('checkpoint recovery inherits consumption instead of minting a new budget',
 });
 
 test('real child session shares Core budget, cannot delegate/execute, and preserves partial status',async()=>{
- let childTools:string[]=[];let parentToolResult='';
+ let childTools:string[]=[];let parentTools:string[]=[];let parentToolResult='';
  const server=createServer(async(req,res)=>{
    let body='';for await(const chunk of req)body+=chunk;
    const r=JSON.parse(body),system=r.messages.find((m:any)=>m.role==='system')?.content||'';
    const child=system.includes('Child: no delegation/execution');
    const returned=r.messages.find((m:any)=>m.role==='tool');
    if(child)childTools=r.tools.map((t:any)=>t.function.name);
+   else parentTools=r.tools.map((t:any)=>t.function.name);
    if(returned)parentToolResult=JSON.stringify(returned.content);
    const delta=child?{role:'assistant',content:JSON.stringify({status:'partial',evidence_refs:[],facts:[],limitations:['missing external service']})}:
      returned?{role:'assistant',content:'{"findings":[]}'}:{role:'assistant',tool_calls:[{index:0,id:'delegate-1',type:'function',function:{name:'delegate_evidence',arguments:'{"objective":"Inspect mock boundary","context":"test"}'}}]};
@@ -39,11 +40,13 @@ test('real child session shares Core budget, cannot delegate/execute, and preser
    res.end('data: [DONE]\n\n');
  });
  await new Promise<void>(r=>server.listen(0,'127.0.0.1',r));
- const rt=new GovernRuntime({model:{base_url:`http://127.0.0.1:${(server.address() as any).port}/v1`,api_key:'test',model:'test'},policy:{sha256:'s',stages:{validator:'ROLE:validator. Return JSON.'}},input:{verification_enabled:true}}, {tool:async()=>{throw Error('unexpected host call')},event:()=>{}});
+ const rt=new GovernRuntime({model:{base_url:`http://127.0.0.1:${(server.address() as any).port}/v1`,api_key:'test',model:'test'},policy:{sha256:'s',stages:{validator:'ROLE:validator. Return JSON.'},tool_profiles:{validator:['read_file','delegate_evidence']}},input:{verification_enabled:true}}, {tool:async()=>{throw Error('unexpected host call')},event:()=>{}});
  try{
    await rt.stage('validator','validator',{});
    assert.equal(rt.budget.turns,3);assert.equal(rt.budget.tools,1);
    assert.ok(!childTools.includes('delegate_evidence'));assert.ok(!childTools.includes('run_verification'));
+   assert.deepEqual([...parentTools].sort(),['delegate_evidence','read_file']);
+   assert.deepEqual(childTools,['read_file']);
    assert.ok(parentToolResult.includes('partial'));
  }finally{rt.cancel();server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));}
 });

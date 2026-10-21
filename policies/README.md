@@ -15,6 +15,20 @@ These global file changes affect all tenants' future runs, not already frozen ru
 Deployments mounting policies read-only must edit the trusted source and redeploy instead.
 Stage base files and specialist fragments may also be manually maintained in version control.
 
+Each stage file now has YAML `name`, `description`, `stage` and `allowed-tools` metadata,
+followed by input, objective, tool-use and output/stop guidance. The policy page renders one
+**current effective Skill** per expanded stage, including approved learned guidance without
+a separate empty supplement panel. Common/risk rules remain independently maintained and injected.
+The stage editor changes only the effective body, preserving metadata and tool declarations.
+A manual stage revision absorbs its displayed guidance and supersedes that stage's old overlay;
+other stages retain their approved guidance. Editing checks both source and effective policy hashes.
+
+`tool-profiles.json` is operator-owned. Effective tools are the intersection of the hard role
+ceiling, operator profile and Skill declaration, narrowed further by run settings and child-task rules.
+The TypeScript registry exposes only these tools, and the Python gateway rechecks frozen permissions.
+Actual argument schemas come from registered implementations, not copied Skill prose. Evolution
+cannot edit metadata, profiles or registered schemas.
+
 `legacy-skills/` preserves the prior Lead/Worker Skill catalog for the `/legacy` workflow only.
 Those files are not loaded into Pi sessions. New database, concurrency, API and migration fragments
 condense the relevant specialist checks without importing the legacy catalog wholesale.

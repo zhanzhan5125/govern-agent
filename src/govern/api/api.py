@@ -3,6 +3,7 @@ import json
 import mimetypes
 import os
 import re
+import tempfile
 import urllib.parse
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -431,7 +432,23 @@ class ApiHandler(BaseHTTPRequestHandler):
                 from govern.policy.bundle import save_manual_rule
                 payload = self._read_json(body)
                 with self.service.govern.lock:
+                    if str(payload.get('section','')).startswith('stage:'):
+                        if payload.get('expected_policy_sha256') != self.service.govern.active_policy(principal.tenant_id)['sha256']:
+                            raise CandidateConflict('活动Skill已变化，请刷新后再编辑')
                     updated = save_manual_rule(payload.get('section'),payload.get('content'),payload.get('expected_source_sha256'))
+                    role = str(payload.get('section','')).removeprefix('stage:')
+                    config = getattr(self.service.govern,'config',{})
+                    if str(payload.get('section','')).startswith('stage:') and role in config.get('policy_overrides',{}):
+                        next_config = {**config,'policy_overrides':{k:v for k,v in config['policy_overrides'].items() if k!=role}}
+                        location = os.environ.get('GOVERN_CONFIG')
+                        if location:
+                            fd, temporary = tempfile.mkstemp(dir=os.path.dirname(location),prefix='.policy-config-')
+                            try:
+                                with os.fdopen(fd,'w',encoding='utf-8') as handle:json.dump(next_config,handle,ensure_ascii=False,indent=2)
+                                os.replace(temporary,location)
+                            finally:
+                                if os.path.exists(temporary):os.unlink(temporary)
+                        self.service.govern.config = next_config
                     self.service.store.audit(principal.tenant_id,principal.username,'policy.manual',
                         str(payload.get('section')),{'source_sha256':updated['source_sha256']})
                     self._send_json(200,self.service.govern.active_policy(principal.tenant_id))

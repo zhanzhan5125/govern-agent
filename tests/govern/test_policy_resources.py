@@ -11,7 +11,7 @@ import unittest
 from unittest.mock import patch
 
 from govern.core.config import Settings
-from govern.policy.bundle import compile_bundle, policy_root, save_manual_rule, select_fragments, ROLES
+from govern.policy.bundle import compile_bundle, policy_root, save_manual_rule, select_fragments, applicable_overrides, ROLES
 from govern.policy.candidate_policy import CandidateConflict
 from govern.policy.feedback_evolution import GovernEvolution, skill
 from govern.storage.store import TaskStore
@@ -67,6 +67,61 @@ class PolicyResourceTests(unittest.TestCase):
         self.assertNotEqual(base['sha256'], changed['sha256'])
         for role in ROLES:
             self.assertEqual(base['stages'][role] == changed['stages'][role], role != 'security')
+
+    def test_effective_skill_has_metadata_tools_and_one_body(self):
+        b=compile_bundle({'security':'Check tenant ownership.'},root=self.root)
+        self.assertEqual('mapper',b['skill_metadata']['mapper']['stage'])
+        self.assertEqual([],b['tool_profiles']['mapper'])
+        self.assertIn('search_code',b['tool_profiles']['security'])
+        self.assertNotIn('run_verification',b['tool_profiles']['security'])
+        self.assertIn('run_verification',b['tool_profiles']['validator'])
+        self.assertIn('allowed-tools:',b['effective_skills']['security'])
+        self.assertEqual(1,b['effective_skills']['security'].count('Check tenant ownership.'))
+
+    def test_metadata_and_profile_cannot_expand_role_permissions(self):
+        path=self.root/'stages/security.md'
+        original=path.read_text()
+        path.write_text(original.replace('[read_file, search_code, delegate_evidence]','[read_file, run_verification]'))
+        with self.assertRaisesRegex(ValueError,'unauthorized tools'):compile_bundle(root=self.root)
+        path.write_text(original)
+        profile=json.loads((self.root/'tool-profiles.json').read_text());profile['security'].append('run_verification')
+        (self.root/'tool-profiles.json').write_text(json.dumps(profile))
+        with self.assertRaisesRegex(ValueError,'hard permissions'):compile_bundle(root=self.root)
+
+    def test_manual_stage_body_preserves_metadata_and_other_stages(self):
+        b=compile_bundle(root=self.root)
+        after=save_manual_rule('stage:mapper','Map every changed unit; mark ambiguity explicitly.',b['source_sha256'],self.root)
+        self.assertEqual(b['skill_metadata'],after['skill_metadata'])
+        self.assertEqual(b['tool_profiles'],after['tool_profiles'])
+        for role in ROLES:
+            if role!='mapper':self.assertEqual(b['effective_skills'][role],after['effective_skills'][role])
+        self.assertIn('mark ambiguity',after['effective_skills']['mapper'])
+        with self.assertRaisesRegex(ValueError,'metadata is read-only'):
+            save_manual_rule('stage:security','---\nallowed-tools: [shell]\n---\nBad',after['source_sha256'],self.root)
+
+    def test_manual_revision_supersedes_only_edited_stage_guidance(self):
+        b=compile_bundle(root=self.root)
+        from govern.review.repository import digest
+        candidate={'content':skill({'security':'Security learning.','correctness':'Correctness learning.'}),
+                   'lineage':{'stage_source_hashes':{r:digest(v) for r,v in b['stage_sources'].items()}}}
+        body=compile_bundle({'security':'Security learning.'},root=self.root)['stage_editable_bodies']['security']
+        after=save_manual_rule('stage:security',body,b['source_sha256'],self.root)
+        chosen=applicable_overrides(candidate,after)
+        self.assertEqual('',chosen['security']);self.assertEqual('Correctness learning.',chosen['correctness'])
+        effective=compile_bundle(chosen,root=self.root)
+        self.assertEqual(1,effective['effective_skills']['security'].count('Security learning.'))
+
+    def test_host_gateway_enforces_frozen_profile_and_hard_ceiling(self):
+        from govern.review.workbench import GovernWorkbench
+        from govern.runtime.artifacts import ArtifactStore
+        p=self.pipeline();p.store.create('tool-test','synthetic',None,{})
+        w=object.__new__(GovernWorkbench);w.artifacts=ArtifactStore(p.store)
+        policy=compile_bundle(root=self.root);policy['tool_profiles']['security']=['read_file']
+        policy['tool_profiles']['mapper']=['read_file']
+        ref=w.artifacts.put('tool-test','default','policy-snapshot',policy)
+        frozen={'policy_ref':ref.uri}
+        with self.assertRaises(PermissionError):w.tool('tool-test','default',frozen,{},'security','search_code',{'query':'a'})
+        with self.assertRaises(PermissionError):w.tool('tool-test','default',frozen,{},'mapper','read_file',{'path':'a.py'})
 
     def pipeline(self):
         settings = Settings(host='127.0.0.1',port=0,db_path=str(Path(self.temp.name)/'state.db'),
@@ -134,5 +189,14 @@ class PolicyResourceTests(unittest.TestCase):
                 self.assertEqual(409,stale.exception.code)
                 with self.assertRaises(urllib.error.HTTPError) as cross:request('https://untrusted.example')
                 self.assertEqual(403,cross.exception.code)
+                current=compile_bundle(root=self.root)
+                payload=json.dumps({'section':'stage:mapper','content':'Map supplied changes with explicit evidence.',
+                    'expected_source_sha256':current['source_sha256'],'expected_policy_sha256':current['sha256']}).encode()
+                with request() as response:
+                    saved=json.load(response)
+                    self.assertIn('Map supplied changes',saved['effective_skills']['mapper'])
+                    self.assertEqual(current['skill_metadata'],saved['skill_metadata'])
+                with self.assertRaises(urllib.error.HTTPError) as stale_stage:request()
+                self.assertEqual(409,stale_stage.exception.code)
             self.assertEqual('policy.manual',store.list_audit('default')[0]['action'])
         finally:server.shutdown();server.server_close();thread.join()

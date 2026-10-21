@@ -65,7 +65,9 @@ export class GovernRuntime {
       (depth?'\nChild: no delegation/execution. Return JSON {status: completed|partial|failed, evidence_refs: [], facts: [], limitations: []}. State partial or failed honestly.':'')});
     await loader.reload();
     const definitions:ToolDefinition[]=[];
+    const toolProfile:string[]|undefined=this.request.policy.tool_profiles?.[role];
     const add=(name:string,description:string,parameters:any,execute:(a:Json)=>Promise<any>)=>{
+      if(toolProfile&&!toolProfile.includes(name))return;
       definitions.push({name,label:name,description,parameters,execute:async(_id,args)=>{
         const start=Date.now();this.usage.tool_calls++;
         try{const result=await execute(args as Json);

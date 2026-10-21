@@ -2,7 +2,7 @@
 import copy
 import json
 from decimal import Decimal
-from .bundle import ROLES, compile_bundle
+from .bundle import ROLES, compile_bundle, applicable_overrides
 from govern.review.repository import digest
 from govern.core.models import Finding, Severity
 from govern.policy.evolution_pipeline import EvolutionPipeline
@@ -66,6 +66,13 @@ class GovernReplayReviewer:
 
 class GovernEvolution(EvolutionPipeline):
     govern_stage_only = True
+    def _baseline(self,tenant,kind,name):
+        base=super()._baseline(tenant,kind,name)
+        if base["candidate_id"]:
+            candidate=self.store.get_evolution_candidate(base["candidate_id"],tenant)
+            base["content"]=skill(applicable_overrides(candidate,compile_bundle()))
+            base["content"]["schema_version"]=candidate["content"].get("schema_version",2)
+        return base
     def __init__(self,w):
         self.workbench=w;s=w.service.settings
         dataset=EvolutionDataset(load_jsonl(s.evolution_dataset_path) if s.evolution_dataset_path else [],load_jsonl(s.evolution_shadow_dataset_path) if s.evolution_shadow_dataset_path else [])
@@ -86,7 +93,8 @@ class GovernEvolution(EvolutionPipeline):
         if lineage.get("stage",changed[0])!=changed[0]:raise ValueError("candidate changed a different stage than feedback attribution")
         source_hash=compile_bundle()["source_sha256"]
         if lineage.get("policy_source_sha256",source_hash)!=source_hash:raise CandidateConflict("policy source changed during generation")
-        lineage.update(stage=changed[0],policy_source_sha256=source_hash,baseline_content_sha256=digest(baseline))
+        lineage.update(stage=changed[0],policy_source_sha256=source_hash,baseline_content_sha256=digest(baseline),
+                       stage_source_hashes={r:digest(v) for r,v in compile_bundle()["stage_sources"].items()})
         return super().propose(tenant_id,kind,name,content,actor,lineage)
     def _get(self,candidate_id,tenant_id,revision=None):
         candidate=super()._get(candidate_id,tenant_id,revision)

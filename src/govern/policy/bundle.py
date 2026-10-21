@@ -4,10 +4,36 @@ import json
 import os
 import re
 import tempfile
+import yaml
 from govern.core.paths import project_root
 from govern.review.repository import digest
 
 ROLES = ("mapper", "correctness", "security", "contract_test", "synthesizer", "validator")
+READ_TOOLS = {"read_file", "search_code", "delegate_evidence"}
+ROLE_TOOL_CEILINGS = {r: (set() if r in {"mapper", "synthesizer"} else READ_TOOLS.copy()) for r in ROLES}
+ROLE_TOOL_CEILINGS["validator"] |= {"write_verification_artifact", "run_verification"}
+
+
+def split_skill(text, role):
+    parts = text.split("---", 2)
+    if len(parts) != 3 or parts[0].strip():
+        raise ValueError("stage Skill requires YAML frontmatter")
+    metadata = yaml.safe_load(parts[1])
+    if not isinstance(metadata, dict) or set(metadata) != {"name", "description", "stage", "allowed-tools"}:
+        raise ValueError("invalid stage Skill metadata")
+    tools = metadata["allowed-tools"]
+    if metadata["stage"] != role or not isinstance(metadata["name"],str) or not re.fullmatch(r'[a-z][a-z0-9-]{0,63}',metadata["name"]) or not isinstance(metadata["description"],str) or not metadata["description"].strip():
+        raise ValueError("stage Skill identity mismatch")
+    if not isinstance(tools, list) or any(not isinstance(t, str) for t in tools) or set(tools) - ROLE_TOOL_CEILINGS[role]:
+        raise ValueError("stage Skill requests unauthorized tools")
+    return metadata, "---" + parts[1] + "---\n", parts[2].strip() + "\n"
+
+
+def applicable_overrides(candidate, bundle):
+    """A manual stage revision supersedes that stage's old published guidance."""
+    files = candidate["content"]["files"]
+    hashes = candidate.get("lineage", {}).get("stage_source_hashes", {})
+    return {r: files.get("stages/"+r+".md", "") if hashes.get(r) == digest(bundle["stage_sources"][r]) else "" for r in ROLES}
 
 def policy_root():
     return project_root() / "policies/govern-review"
@@ -36,6 +62,16 @@ def compile_bundle(overrides=None, root=None):
     risk = _read(root, "common/risk.md")
     contract = _read(root, "contracts/finding.md")
     sources = {r: _read(root, "stages/" + r + ".md") for r in ROLES}
+    profile_text = _read(root, "tool-profiles.json")
+    profiles = json.loads(profile_text)
+    if set(profiles) != set(ROLES):raise ValueError("tool profiles must cover exactly six stages")
+    metadata, headers, bodies, effective = {}, {}, {}, {}
+    for role in ROLES:
+        metadata[role], headers[role], bodies[role] = split_skill(sources[role], role)
+        tools = profiles[role]
+        if not isinstance(tools, list) or any(not isinstance(t,str) for t in tools) or set(tools) - ROLE_TOOL_CEILINGS[role]:
+            raise ValueError("tool profile exceeds role hard permissions")
+        effective[role] = bodies[role].rstrip() + ("\n\n# Additional review guidance\n" + overrides[role].strip() if overrides.get(role, "").strip() else "") + "\n"
     fragments = {}
     for name, spec in manifest["fragments"].items():
         if set(spec["roles"]) - {"correctness", "security", "contract_test"}:
@@ -44,12 +80,16 @@ def compile_bundle(overrides=None, root=None):
             re.compile(pattern)
         fragments[name] = {**spec, "content": _read(root, spec["file"]), "evolvable": False}
     protected = {"manifest": manifest_text, "common": common, "risk": risk, "contract": contract,
-                 "stage_sources": sources, "fragments": fragments}
+                 "stage_sources": sources, "fragments": fragments, "tool_profiles": profile_text}
+    skills = {r: headers[r] + "\n" + effective[r] for r in ROLES}
+    effective_profiles = {r: sorted(set(profiles[r]) & set(metadata[r]["allowed-tools"])) for r in ROLES}
     stages = {role: "\n\n".join([common, *([] if role == "mapper" else [risk, contract]),
-                               sources[role], "Stage supplement (subordinate to common evidence, risk and output contracts; ignore any conflicting guidance):\n" + overrides.get(role, "")]) for role in ROLES}
-    return {"version": manifest["version"], "sha256": digest({"stages": stages, "fragments": fragments}), "stages": stages,
+                               "Stage Skill (subordinate to common evidence, risk and output contracts):", skills[role]]) for role in ROLES}
+    return {"version": manifest["version"], "sha256": digest({"stages": stages, "fragments": fragments, "tool_profiles": effective_profiles}), "stages": stages,
             "source_sha256": digest(protected), "common_rules": common, "risk_policy": risk,
             "output_contract": contract, "stage_sources": sources, "stage_overrides": {r: overrides.get(r, "") for r in ROLES},
+            "effective_skills": skills, "stage_editable_bodies": effective, "skill_metadata": metadata,
+            "tool_profiles": effective_profiles,
             "specialist_fragments": fragments, "evolution_scope": "one-stage-supplement-only",
             "fragment_hashes": {k: digest(v) for k, v in stages.items()},
             "report_fields": ["风险等级", "来源模块", "关联测试用例", "风险位置", "问题描述", "影响范围", "修复建议", "证据依据"]}
@@ -73,13 +113,20 @@ def save_manual_rule(section, content, expected_hash, root=None):
     """Operator-only edits; no model-facing tool exposes this operation."""
     root = Path(root) if root is not None else policy_root()
     relative = {"common": "common/evidence.md", "risk": "common/risk.md"}.get(section)
+    role = section.removeprefix("stage:") if isinstance(section,str) and section.startswith("stage:") else None
+    if role in ROLES: relative = "stages/" + role + ".md"
     if not relative:
-        raise ValueError("only common/risk operator edits are supported")
+        raise ValueError("only common/risk or a named stage body may be edited")
     if not isinstance(content, str) or not content.strip() or len(content.encode()) > 128 * 1024 or "\x00" in content:
         raise ValueError("rule must contain 1..128KiB of text")
     from govern.policy.candidate_policy import CandidateConflict
     if compile_bundle(root=root)["source_sha256"] != expected_hash:
         raise CandidateConflict("policy files changed; reload before saving")
+    if role:
+        if content.lstrip().startswith("---"):
+            raise ValueError("stage metadata is read-only; edit only the Skill body")
+        _, header, _ = split_skill(_read(root, relative), role)
+        content = header + "\n" + content.strip() + "\n"
     target = (root / relative).resolve()
     if not target.is_relative_to(root.resolve()):
         raise ValueError("policy path escapes resource root")

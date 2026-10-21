@@ -11,7 +11,7 @@ import threading
 import uuid
 from govern.runtime.pi_bridge import PiBridge
 from govern.integrations.atlassian import adapter
-from govern.policy.bundle import compile_bundle, render_report, select_fragments, ROLES
+from govern.policy.bundle import compile_bundle, render_report, select_fragments, applicable_overrides, ROLE_TOOL_CEILINGS, ROLES
 from .repository import capture, change_units, describe, digest, git, safe_path
 from govern.runtime.verification import VerificationGateway, ExecutionProfile
 from govern.core.models import TraceEvent, TaskState
@@ -42,7 +42,7 @@ class GovernWorkbench:
         head = self.store.evolution_release_head(tenant, "skill", "govern-review")
         if head["candidate_id"]:
             candidate = self.store.get_evolution_candidate(head["candidate_id"], tenant)
-            return compile_bundle(overrides(candidate["content"]))
+            return compile_bundle(applicable_overrides(candidate, compile_bundle()))
         return compile_bundle(self.config.get("policy_overrides"))
 
     def model_identity(self):
@@ -259,6 +259,9 @@ class GovernWorkbench:
     def tool(self, task, tenant, frozen, snapshot, role, name, args):
         root_role = role.split(":")[0]
         if root_role not in ROLES: raise PermissionError("invalid tool role")
+        policy = self.artifacts.get(frozen["policy_ref"].removeprefix("artifact://"), tenant)
+        allowed = set(policy.get("tool_profiles", {}).get(root_role, ROLE_TOOL_CEILINGS[root_role]))
+        if name not in allowed or name not in ROLE_TOOL_CEILINGS[root_role]: raise PermissionError("tool denied by frozen stage profile")
         if name == "run_verification":
             if not self.owned(task, tenant)["input"].get("verification_enabled"): raise PermissionError("runtime verification disabled")
             synth = self.store.load_checkpoints(task).get("pi:synthesizer", {}).get("state", {})
