@@ -4,11 +4,11 @@ import tempfile
 import unittest
 from unittest.mock import Mock
 
-from evoagent.evolution.candidate_policy import CandidatePolicy
-from evoagent.evolution.evolution_monitor import EvolutionMonitor
-from evoagent.runtime.runtime import RuntimeCancelled
-from evoagent.application.service import ReviewService
-from evoagent.storage.store import TaskStore
+from govern.policy.candidate_policy import CandidatePolicy
+from govern.policy.evolution_monitor import EvolutionMonitor
+from govern.runtime.runtime import RuntimeCancelled
+from govern.api.service import ReviewService
+from govern.storage.store import TaskStore
 
 
 class EvolutionMonitorTests(unittest.TestCase):

@@ -3,10 +3,10 @@ import os
 import tempfile
 import unittest
 
-from evoagent.agents.agentic_core import ModeRouterReviewer
-from evoagent.core.diff_parser import parse_unified_diff
-from evoagent.memory.memory import MemoryManager
-from evoagent.storage.store import TaskStore
+from govern.review.agentic_core import ModeRouterReviewer
+from govern.core.diff_parser import parse_unified_diff
+from govern.memory.memory import MemoryManager
+from govern.storage.store import TaskStore
 
 
 DIFF = "--- a/app.py\n+++ b/app.py\n@@ -1 +1 @@\n-old\n+eval(user_input)\n"

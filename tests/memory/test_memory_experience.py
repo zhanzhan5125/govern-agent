@@ -6,10 +6,10 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import Mock
 
-from evoagent.memory.memory import MemoryManager
-from evoagent.memory.memory_governance import MemoryTransitionError
-from evoagent.core.models import TaskState, TraceEvent
-from evoagent.storage.store import TaskStore, utc_now
+from govern.memory.memory import MemoryManager
+from govern.memory.memory_governance import MemoryTransitionError
+from govern.core.models import TaskState, TraceEvent
+from govern.storage.store import TaskStore, utc_now
 
 
 class MemoryExperienceContract:
@@ -89,7 +89,7 @@ class MemoryExperienceContract:
             manager.transition(memory["id"], "PROMOTED", current["version"])
 
     def test_service_feedback_updates_only_used_memory(self):
-        from evoagent.application.service import ReviewService
+        from govern.api.service import ReviewService
         memory = self.memory()
         self.task("one")
         self.store.succeed("one", SimpleNamespace(to_dict=lambda: {"findings": []}),

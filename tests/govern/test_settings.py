@@ -5,9 +5,9 @@ import threading
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
-from evoagent.govern.settings import public_settings,save_settings
-from evoagent.govern.atlassian import AtlassianJiraAdapter
-from evoagent.govern.repository import capture
+from govern.core.operator_settings import public_settings,save_settings
+from govern.integrations.atlassian import AtlassianJiraAdapter
+from govern.review.repository import capture
 
 
 class SettingsTests(unittest.TestCase):
@@ -15,7 +15,7 @@ class SettingsTests(unittest.TestCase):
         w=SimpleNamespace(service=SimpleNamespace(llm_config={},settings=SimpleNamespace(database_url=''),queue=SimpleNamespace(backend='memory-acked')),
             store=SimpleNamespace(list_tasks=lambda *args:[]),lock=threading.RLock(),config={},jira=SimpleNamespace(client=None),
             bridge=SimpleNamespace(command=['node']),verification=SimpleNamespace(backend=SimpleNamespace(available=lambda:False),profiles={}))
-        with tempfile.TemporaryDirectory() as folder,patch.dict('os.environ',{'GOVERN_CONFIG':str(Path(folder)/'config.json')}),patch('evoagent.govern.evolution.GovernEvolution',lambda _:object()):
+        with tempfile.TemporaryDirectory() as folder,patch.dict('os.environ',{'GOVERN_CONFIG':str(Path(folder)/'config.json')}),patch('govern.policy.feedback_evolution.GovernEvolution',lambda _:object()):
             result=save_settings(w,{'model':{'base_url':'https://example.com/v1','model':'test','api_key':'FAKE-TEST-KEY'}})
             self.assertTrue(result['model']['configured']);self.assertNotIn('FAKE-TEST-KEY',json.dumps(result))
             self.assertEqual('FAKE-TEST-KEY',json.loads((Path(folder)/'config.json').read_text())['model']['api_key'])

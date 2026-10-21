@@ -2,9 +2,9 @@ import os
 import tempfile
 import unittest
 
-from evoagent.runtime.harness import ReviewHarness
-from evoagent.agents.reviewer import LocalRuleReviewer
-from evoagent.storage.store import TaskStore
+from govern.runtime.harness import ReviewHarness
+from govern.review.reviewer import LocalRuleReviewer
+from govern.storage.store import TaskStore
 
 
 class HarnessTests(unittest.TestCase):

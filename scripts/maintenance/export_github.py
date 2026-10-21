@@ -10,11 +10,12 @@ import shutil
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-PUBLIC_DIRS = ('evoagent', 'tests', 'scripts', 'docs', 'data', 'skills', 'web')
+PUBLIC_DIRS = ('src', 'tests', 'scripts', 'docs', 'data', 'skills', 'web', 'frontend', 'pi-runtime')
 PUBLIC_FILES = ('README.md', 'requirements.txt', 'Dockerfile', 'docker-compose.yml',
-                '.env.example', '.gitignore', '.dockerignore', 'evolution-data/README.md')
+                '.env.example', '.gitignore', '.dockerignore', 'evolution-data/README.md',
+                'pyproject.toml', 'GOVERN_IMPLEMENTATION.md', 'THIRD_PARTY_NOTICES.md')
 EXCLUDED_DIRS = {'.venv', 'venv', '__pycache__', '.git', '.idea', '.vscode',
-                 'node_modules', '.pytest_cache', '.mypy_cache', '.ruff_cache'}
+                 'node_modules', '.pytest_cache', '.mypy_cache', '.ruff_cache', 'vendor', '.govern'}
 
 
 def allowed(path):

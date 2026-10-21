@@ -24,12 +24,12 @@ services:
       timeout: 3s
       retries: 15
 
-  evoagent:
+  govern:
     build: .
     ports:
       - "8080:8080"
     volumes:
-      - ./evoagent:/app/evoagent:ro
+      - ./src:/app/src:ro
       - ./web:/app/web:ro
       - ./skills:/app/skills:ro
       - ./evolution-data:/app/evolution-data:ro

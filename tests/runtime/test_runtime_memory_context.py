@@ -3,14 +3,14 @@ import tempfile
 import unittest
 import json
 
-from evoagent.agents.agentic_core import BoundedRole
-from evoagent.memory.context_manager import ContextManager
-from evoagent.memory.memory import MemoryManager
-from evoagent.runtime.runtime import (
+from govern.review.agentic_core import BoundedRole
+from govern.memory.context_manager import ContextManager
+from govern.memory.memory import MemoryManager
+from govern.runtime.runtime import (
     AgentRuntime, AgentTool, RuntimeNode, ToolProtocolError, ToolRegistry,
 )
-from evoagent.storage.store import TaskStore, utc_now
-from evoagent.infrastructure.telemetry import ExecutionLedger
+from govern.storage.store import TaskStore, utc_now
+from govern.infrastructure.telemetry import ExecutionLedger
 
 
 class RuntimeMemoryTests(unittest.TestCase):

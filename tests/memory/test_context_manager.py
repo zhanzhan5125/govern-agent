@@ -3,11 +3,11 @@ import os
 import tempfile
 import unittest
 
-from evoagent.agents.agentic_core import ModeRouterReviewer
-from evoagent.memory.context_manager import ContextManager, estimate_tokens
-from evoagent.core.diff_parser import parse_unified_diff
-from evoagent.memory.memory import MemoryManager
-from evoagent.storage.store import TaskStore
+from govern.review.agentic_core import ModeRouterReviewer
+from govern.memory.context_manager import ContextManager, estimate_tokens
+from govern.core.diff_parser import parse_unified_diff
+from govern.memory.memory import MemoryManager
+from govern.storage.store import TaskStore
 
 
 def large_diff():

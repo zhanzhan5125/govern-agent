@@ -4,11 +4,11 @@ import subprocess
 import tempfile
 import unittest
 import time
-from evoagent.govern.repository import capture, change_units, digest
-from evoagent.govern.policy import compile_bundle, render_report
-from evoagent.govern.verification import classify, VerificationGateway, ExecutionProfile, DockerBackend
-from evoagent.runtime.artifacts import ArtifactStore
-from evoagent.storage.store import TaskStore
+from govern.review.repository import capture, change_units, digest
+from govern.policy.bundle import compile_bundle, render_report
+from govern.runtime.verification import classify, VerificationGateway, ExecutionProfile, DockerBackend
+from govern.runtime.artifacts import ArtifactStore
+from govern.storage.store import TaskStore
 
 
 class GovernTests(unittest.TestCase):
@@ -53,7 +53,7 @@ class GovernTests(unittest.TestCase):
         self.assertNotIn('.env',snapshot['head_files']);self.assertNotIn('.env',snapshot['base_files'])
         self.assertNotIn('PRIVATE',snapshot['diff']);self.assertIn('.env',snapshot['omitted_files'])
     def test_jira_pages_and_freezes_criteria_without_agent_issue_exploration(self):
-        from evoagent.govern.jira import JiraAdapter
+        from govern.integrations.jira_mcp import JiraAdapter
         calls=[]
         class Client:
             def call(self,name,args):
@@ -102,9 +102,9 @@ class GovernTests(unittest.TestCase):
         bad=artifacts.put('t','default','verification-plan',{'hypothesis':'h','assertion_source':'req','target_symbols':['pay'],'selectors':['a'],'mocked_symbols':['pay']}).uri
         with self.assertRaises(ValueError):gateway.run('t','default','validator',ref,{**args,'test_plan_ref':bad})
     def test_service_report_feedback_and_govern_candidate_reuse(self):
-        from evoagent.core.config import Settings
-        from evoagent.application.service import ReviewService
-        from evoagent.govern.evolution import skill
+        from govern.core.config import Settings
+        from govern.api.service import ReviewService
+        from govern.policy.feedback_evolution import skill
         self.repo();(self.root/'a.py').write_text('def pay(x):\n    return x+1\n')
         settings=Settings(host='127.0.0.1',port=0,db_path=str(self.root/'test.db'),max_diff_bytes=100000,max_steps=8,
             timeout_seconds=10,llm_base_url='http://127.0.0.1:9/v1',llm_api_key='test-only',llm_model='test',
@@ -135,7 +135,7 @@ class GovernTests(unittest.TestCase):
             self.assertEqual('security',missed['source_stage']);self.assertTrue(missed['finding']['finding_id'])
             candidate=service.govern.evolution.propose('default','skill','govern-review',skill({'correctness':'Check explicit function contracts and frozen evidence.'}),'tester')
             self.assertEqual('STATIC_PASSED',candidate['status'])
-            from evoagent.application.api import ApiHandler
+            from govern.api.api import ApiHandler
             from http.server import ThreadingHTTPServer
             import threading
             import urllib.request
@@ -162,7 +162,7 @@ class GovernTests(unittest.TestCase):
             finally:server.shutdown();thread.join(timeout=3);server.server_close()
         finally:service.queue.close()
     def test_release_gate_strict_five_points_and_sandbox_guardrails(self):
-        from evoagent.govern.evolution import GovernCandidatePolicy
+        from govern.policy.feedback_evolution import GovernCandidatePolicy
         from tests.evolution.test_evolution_governance import metrics
         policy=GovernCandidatePolicy()
         baseline=metrics(precision=.8,recall=.75,p01_total=4,p01_recall=.75,sandbox_duration_ms=100,verification_timeout_rate=0.)
@@ -183,7 +183,7 @@ class GovernTests(unittest.TestCase):
                 calls.append(command);stdout.write(b'GOVERN_RESULT={"exit_code":0,"collected":1}\n');stdout.flush()
             def poll(self):return 0
             def wait(self,**kwargs):return 0
-        with patch('evoagent.govern.verification.subprocess.Popen',Process), patch('evoagent.govern.verification.subprocess.run'):
+        with patch('govern.runtime.verification.subprocess.Popen',Process), patch('govern.runtime.verification.subprocess.run'):
             result=DockerBackend().execute({'a.py':'def pay(): return 1'},{'test_pay.py':'from a import pay\ndef test_pay(): assert pay()==1'},['.govern-tests/test_pay.py'],ExecutionProfile('registry/python@sha256:'+'a'*64))
         self.assertEqual('passed',result['test_status'])
         command=calls[0]

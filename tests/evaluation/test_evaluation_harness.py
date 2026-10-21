@@ -2,15 +2,15 @@ import os
 import tempfile
 import unittest
 
-from evoagent.evaluation.evaluation_benchmark import (
+from govern.evaluation.evaluation_benchmark import (
     generate_controlled_pr_cases,
 )
-from evoagent.evaluation.evaluation_harness import (
+from govern.evaluation.evaluation_harness import (
     dataset_fingerprint,
     load_jsonl,
     one_to_one_match,
 )
-from evoagent.core.models import Finding, Severity
+from govern.core.models import Finding, Severity
 
 
 class EndToEndEvaluationTests(unittest.TestCase):

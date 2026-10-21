@@ -14,13 +14,13 @@ import sys
 from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / 'src'))
 
 
 def main():
     failures = []
     counts = {}
-    sources = sorted(p for folder in ('evoagent', 'tests', 'scripts')
+    sources = sorted(p for folder in ('src/govern', 'tests', 'scripts')
                      for p in (ROOT / folder).rglob('*.py'))
     for path in sources:
         try:
@@ -30,10 +30,10 @@ def main():
     counts['python_sources'] = len(sources)
 
     modules = []
-    for path in sorted((ROOT / 'evoagent').rglob('*.py')):
+    for path in sorted((ROOT / 'src/govern').rglob('*.py')):
         if path.name == '__main__.py':
             continue
-        parts = list(path.relative_to(ROOT).with_suffix('').parts)
+        parts = list(path.relative_to(ROOT / 'src').with_suffix('').parts)
         if parts[-1] == '__init__':
             parts.pop()
         name = '.'.join(parts)
@@ -45,7 +45,7 @@ def main():
     counts['imported_modules'] = len(modules)
 
     try:
-        from evoagent.application.api import WEB_ROOT
+        from govern.api.api import WEB_ROOT
         if Path(WEB_ROOT).resolve() != ROOT / 'web':
             failures.append('resource: application WEB_ROOT is not repository web/')
     except Exception as exc:

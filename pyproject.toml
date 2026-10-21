@@ -13,11 +13,11 @@ dependencies = ["PyYAML>=5.4,<7"]
 analysis = ["tree-sitter>=0.25,<0.26", "tree-sitter-javascript>=0.25,<0.26", "tree-sitter-typescript>=0.23,<0.24"]
 
 [project.scripts]
-govern-harness = "evoagent.application.api:run"
-
-[tool.setuptools]
-packages = ["evoagent", "evoagent.govern", "evoagent.agents", "evoagent.application", "evoagent.core", "evoagent.evaluation", "evoagent.evolution", "evoagent.infrastructure", "evoagent.integrations", "evoagent.memory", "evoagent.repair", "evoagent.runtime", "evoagent.storage", "evoagent.skills"]
+govern-harness = "govern.api.api:run"
 
 [tool.setuptools.package-dir]
-evoagent = "EvoAgent"
-"evoagent.skills" = "skills"
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["govern*"]

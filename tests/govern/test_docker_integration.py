@@ -3,9 +3,9 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
-from evoagent.govern.verification import DockerBackend, ExecutionProfile, VerificationGateway
-from evoagent.runtime.artifacts import ArtifactStore
-from evoagent.storage.store import TaskStore
+from govern.runtime.verification import DockerBackend, ExecutionProfile, VerificationGateway
+from govern.runtime.artifacts import ArtifactStore
+from govern.storage.store import TaskStore
 
 
 @unittest.skipUnless(os.environ.get('GOVERN_TEST_IMAGE'), 'set GOVERN_TEST_IMAGE to a prepared digest-pinned Pytest image')

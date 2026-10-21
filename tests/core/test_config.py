@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from evoagent.core.config import load_dotenv
+from govern.core.config import load_dotenv
 
 
 class DotenvTests(unittest.TestCase):

@@ -8,10 +8,10 @@ import urllib.error
 import urllib.request
 from http.server import ThreadingHTTPServer
 
-from evoagent.application.api import ApiHandler
-from evoagent.integrations.auth import hash_password
-from evoagent.core.config import Settings
-from evoagent.application.service import ReviewService
+from govern.api.api import ApiHandler
+from govern.integrations.auth import hash_password
+from govern.core.config import Settings
+from govern.api.service import ReviewService
 
 
 class EvolutionApiTests(unittest.TestCase):

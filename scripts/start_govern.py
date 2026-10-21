@@ -8,7 +8,7 @@ import sys
 import subprocess
 
 ROOT=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(ROOT))
+sys.path.insert(0,str(ROOT/'src'))
 
 
 def main():
@@ -49,7 +49,7 @@ def main():
         if bundled.exists() and supported(str(bundled)):node=str(bundled)
         else:raise SystemExit('Pi运行层需要Node 22.19+，请设置GOVERN_NODE指向新版Node；当前服务未启动。')
     if node:os.environ['GOVERN_NODE']=node
-    from evoagent.application.api import run
+    from govern.api.api import run
     run()
 
 

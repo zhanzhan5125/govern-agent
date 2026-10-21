@@ -3,12 +3,12 @@ import tempfile
 import time
 import unittest
 
-from evoagent.core.config import Settings
-from evoagent.evolution.evolution import EvolutionEngine, RegressionEvaluator
-from evoagent.repair.fixer import SafeFixer
-from evoagent.core.models import Finding, Severity
-from evoagent.application.service import ReviewService
-from evoagent.storage.store import TaskStore
+from govern.core.config import Settings
+from govern.policy.evolution import EvolutionEngine, RegressionEvaluator
+from govern.repair.fixer import SafeFixer
+from govern.core.models import Finding, Severity
+from govern.api.service import ReviewService
+from govern.storage.store import TaskStore
 from tests.support.agentic_fake import enable_agentic_service
 
 

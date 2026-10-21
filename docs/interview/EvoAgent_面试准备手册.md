@@ -1864,24 +1864,24 @@ flowchart TD
 | 原始长文、历史简历与指标摘要 | [完整版项目文档](<../project/EvoAgent：自进化Harness智能体 (3)_1.md>) |
 | 优化计划与未落地边界 | [四方向优化方案](<../design/EvoAgent_四方向优化方案.md>) |
 | Runtime 说明 | [Runtime 完整说明](<../design/Runtime_Harness_优化后完整说明.md>) |
-| Runtime 执行与副作用 | [runtime.py](<../../evoagent/runtime/runtime.py>)、[journal.py](<../../evoagent/runtime/journal.py>)、[hooks.py](<../../evoagent/runtime/hooks.py>) |
-| 门禁的实际检查范围 | [goal_gate.py](<../../evoagent/runtime/goal_gate.py>)、[gates.py](<../../evoagent/agents/gates.py>) |
+| Runtime 执行与副作用 | [runtime.py](<../../src/govern/runtime/runtime.py>)、[journal.py](<../../src/govern/runtime/journal.py>)、[hooks.py](<../../src/govern/runtime/hooks.py>) |
+| 门禁的实际检查范围 | [goal_gate.py](<../../src/govern/runtime/goal_gate.py>)、[gates.py](<../../src/govern/review/gates.py>) |
 | 200 次重放与框架性能 | [基准 JSON](<../benchmarks/runtime_harness_benchmark.json>)、[基准脚本](<../../scripts/benchmarks/benchmark_runtime_harness.py>) |
-| 协作、角色循环、返工和阶段预算 | [agentic_core.py](<../../evoagent/agents/agentic_core.py>)、[协作测试](<../../tests/agents/test_lead_worker_collaboration.py>) |
-| 当前有无 Critic 消融 | [evaluation_v2.py](<../../evoagent/evaluation/evaluation_v2.py>)、[消融入口](<../../scripts/evaluation/run_agentic_evaluation.py>)、[角色拓扑测试](<../../tests/evaluation/test_agentic_evaluation.py>) |
-| 受控样本来源与分区 | [evaluation_benchmark.py](<../../evoagent/evaluation/evaluation_benchmark.py>)、[数据文件](<../../data/benchmarks/pr_diff_100.jsonl>) |
+| 协作、角色循环、返工和阶段预算 | [agentic_core.py](<../../src/govern/review/agentic_core.py>)、[协作测试](<../../tests/agents/test_lead_worker_collaboration.py>) |
+| 当前有无 Critic 消融 | [evaluation_v2.py](<../../src/govern/evaluation/evaluation_v2.py>)、[消融入口](<../../scripts/evaluation/run_agentic_evaluation.py>)、[角色拓扑测试](<../../tests/evaluation/test_agentic_evaluation.py>) |
+| 受控样本来源与分区 | [evaluation_benchmark.py](<../../src/govern/evaluation/evaluation_benchmark.py>)、[数据文件](<../../data/benchmarks/pr_diff_100.jsonl>) |
 | 本次数据构成与纯规则指标复核 | [核算报告](<../benchmarks/interview_metric_audit.json>)，未调用大模型，不代表产品多 Agent 消融 |
-| 匹配与评测指标 | [evaluation_harness.py](<../../evoagent/evaluation/evaluation_harness.py>) |
+| 匹配与评测指标 | [evaluation_harness.py](<../../src/govern/evaluation/evaluation_harness.py>) |
 | 自进化实施状态与真实开发问题 | [实施记录](<../design/Self_Evolution_优化实施记录.md>) |
 | 当前数据、审批与发布使用边界 | [治理使用说明](<../design/Self_Evolution_治理使用说明.md>) |
-| 候选门禁、并发与监控 | [candidate_policy.py](<../../evoagent/evolution/candidate_policy.py>)、[candidate_store.py](<../../evoagent/evolution/candidate_store.py>)、[evolution_lease.py](<../../evoagent/evolution/evolution_lease.py>)、[evolution_monitor.py](<../../evoagent/evolution/evolution_monitor.py>) |
+| 候选门禁、并发与监控 | [candidate_policy.py](<../../src/govern/policy/candidate_policy.py>)、[candidate_store.py](<../../src/govern/policy/candidate_store.py>)、[evolution_lease.py](<../../src/govern/policy/evolution_lease.py>)、[evolution_monitor.py](<../../src/govern/policy/evolution_monitor.py>) |
 | Context/Memory 设计与基准范围 | [完整说明](<../design/Context_Memory_优化后完整说明.md>)、[基准 JSON](<../benchmarks/context_memory_benchmark.json>) |
-| 压缩算法、关注路径与保留率 | [context_manager.py](<../../evoagent/memory/context_manager.py>)、[compression_eval.py](<../../evoagent/evaluation/compression_eval.py>)、[压力脚本](<../../scripts/benchmarks/benchmark_context_memory.py>) |
-| 检索、治理与实际使用反馈 | [memory_retrieval.py](<../../evoagent/memory/memory_retrieval.py>)、[memory_governance.py](<../../evoagent/memory/memory_governance.py>)、[memory_experience_store.py](<../../evoagent/memory/memory_experience_store.py>) |
-| 队列退避和接管的真实实现 | [task_queue.py](<../../evoagent/infrastructure/task_queue.py>) |
-| 参数默认值 | [config.py](<../../evoagent/core/config.py>) |
-| Skill 资源与权限 | [skills.py](<../../evoagent/skills/skills.py>) |
-| 修复两条路径及验证区别 | [fixer.py](<../../evoagent/repair/fixer.py>)、[patching.py](<../../evoagent/repair/patching.py>)、[verifier.py](<../../evoagent/repair/verifier.py>) |
+| 压缩算法、关注路径与保留率 | [context_manager.py](<../../src/govern/memory/context_manager.py>)、[compression_eval.py](<../../src/govern/evaluation/compression_eval.py>)、[压力脚本](<../../scripts/benchmarks/benchmark_context_memory.py>) |
+| 检索、治理与实际使用反馈 | [memory_retrieval.py](<../../src/govern/memory/memory_retrieval.py>)、[memory_governance.py](<../../src/govern/memory/memory_governance.py>)、[memory_experience_store.py](<../../src/govern/memory/memory_experience_store.py>) |
+| 队列退避和接管的真实实现 | [task_queue.py](<../../src/govern/infrastructure/task_queue.py>) |
+| 参数默认值 | [config.py](<../../src/govern/core/config.py>) |
+| Skill 资源与权限 | [skills.py](<../../src/govern/skills/skills.py>) |
+| 修复两条路径及验证区别 | [fixer.py](<../../src/govern/repair/fixer.py>)、[patching.py](<../../src/govern/repair/patching.py>)、[verifier.py](<../../src/govern/repair/verifier.py>) |
 | 部署版本和卷 | [Compose 配置](<../../docker-compose.yml>) |
 | 简历写作原则 | [STAR 指南](<STAR法则_项目与实习经历编写指南.md>) |
 

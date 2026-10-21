@@ -8,12 +8,12 @@ import threading
 import unittest
 from unittest.mock import patch
 
-from evoagent.evolution.candidate_policy import CandidateConflict, CandidatePolicy
-from evoagent.storage.store import TaskStore
-from evoagent.evolution.failure_diagnosis import FailureDiagnosis
-from evoagent.evolution.evolution_replay import EvolutionDataset, EvolutionReplay
-from evoagent.evolution.evolution_pipeline import EvolutionPipeline
-from evoagent.agents.reviewer import LocalRuleReviewer
+from govern.policy.candidate_policy import CandidateConflict, CandidatePolicy
+from govern.storage.store import TaskStore
+from govern.policy.failure_diagnosis import FailureDiagnosis
+from govern.policy.evolution_replay import EvolutionDataset, EvolutionReplay
+from govern.policy.evolution_pipeline import EvolutionPipeline
+from govern.review.reviewer import LocalRuleReviewer
 
 
 TEST_DIFF = "--- a/auth.py\n+++ b/auth.py\n@@ -1 +1 @@\n-old\n+result = eval(user_input)\n"
@@ -284,7 +284,7 @@ class EvolutionReplayTests(unittest.TestCase):
         replay = EvolutionReplay(ControlledReplayReviewer)
         report = replay.compare("prompt", {}, {"detect": True, "missing": True}, cases, "validation")
         self.assertFalse(report["passed"])
-        from evoagent.core.models import Severity
+        from govern.core.models import Severity
         class LowSeverity(ControlledReplayReviewer):
             def review_case(self, case, parsed):
                 findings = super().review_case(case, parsed)
@@ -338,7 +338,7 @@ class EvolutionPipelineTests(unittest.TestCase):
             if not release.wait(5):
                 raise AssertionError("test worker was not released")
             return {"passed": False, "reason": "controlled rejection"}
-        with patch("evoagent.evolution.evolution_pipeline.EvolutionReplay.compare", side_effect=controlled_compare) as replay:
+        with patch("govern.policy.evolution_pipeline.EvolutionReplay.compare", side_effect=controlled_compare) as replay:
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
                 worker = pool.submit(self.pipeline.evaluate, candidate["id"], "a", candidate["revision"])
                 try:
@@ -426,8 +426,8 @@ class EvolutionPipelineTests(unittest.TestCase):
         self.assertEqual([], self.store.active_evolution_candidates("a"))
 
     def test_product_reviewer_records_real_skill_selection(self):
-        from evoagent.evolution.evolution_replay import EvolutionProductReviewer
-        from evoagent.core.diff_parser import parse_unified_diff
+        from govern.policy.evolution_replay import EvolutionProductReviewer
+        from govern.core.diff_parser import parse_unified_diff
         from tests.skills.test_skill_evolution import artifact, SkillAwareClient, RISK_DIFF
         reviewer = EvolutionProductReviewer("skill", artifact(), SkillAwareClient())
         reviewer.review_case({"diff": RISK_DIFF, "repository": "org/test"}, parse_unified_diff(RISK_DIFF))

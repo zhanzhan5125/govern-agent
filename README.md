@@ -1,4 +1,6 @@
-# Govern Agent（基于EvoAgent改造）
+# Govern Agent
+
+来源与第三方依赖说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。历史设计材料保留在 `docs/`，其中旧目录及命令以本页和当前启动脚本为准。
 
 新版入口是Vue 3控制台，Python服务同源提供前端与API。旧版EvoAgent控制台保留在`/legacy`。
 
@@ -47,14 +49,14 @@ Lead → 并行 Worker → 证据返工 → Critic → Lead 裁决 → 完成门
 ```
 
 ```text
-EvoAgent/
-├── evoagent/                 # python -m evoagent
-│   ├── application/          # HTTP API、应用服务和任务入口
+govern-agent/
+├── src/govern/               # python -m govern（先 editable 安装）
+│   ├── api/                  # HTTP API、应用服务和任务入口
 │   ├── core/                 # 配置、模型、模式和 Diff 解析
-│   ├── agents/               # 角色协作、模型客户端、工具和报告
+│   ├── review/               # 仓库分析、工作台、审查角色、工具和报告
 │   ├── runtime/              # Harness、循环、恢复、日志、审批和证据
 │   ├── memory/               # 上下文、检索、记忆治理和使用反馈
-│   ├── evolution/            # 候选、诊断、回放、租约、发布和监控
+│   ├── policy/               # 阶段策略、反馈进化、候选、租约和发布治理
 │   ├── evaluation/           # 样本、计分、消融和机制证明
 │   ├── storage/              # SQLite / PostgreSQL
 │   ├── integrations/         # GitHub 与身份认证
@@ -82,7 +84,7 @@ EvoAgent/
 └── docker-compose.yml
 ```
 
-入口仍为 `python -m evoagent`。内部导入改为模块路径，例如 `from evoagent.application.service import ReviewService`；旧平铺导入路径不再保留。详见 [模块化目录说明](docs/design/模块化目录与迁移说明.md)。
+推荐入口为 `python scripts/start_govern.py`，直接解析源码目录并保留本地配置。`pip install -e .` 后可用 `python -m govern` 或 `govern-harness` 启动基础 API。内部导入例如 `from govern.api.service import ReviewService`；不保留旧包路径桥接。`EVOAGENT_*` 环境变量、历史数据库标记和队列键暂保留，以兼容已有本地状态。
 
 ## 本地启动
 
@@ -94,6 +96,7 @@ Windows PowerShell：
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
+python -m pip install -e .
 Copy-Item .env.example .env
 ```
 
@@ -103,6 +106,7 @@ Linux / macOS：
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
+python -m pip install -e .
 cp .env.example .env
 ```
 
@@ -118,7 +122,7 @@ EVOAGENT_LLM_MODEL=replace-with-your-model
 地址、密钥和模型名需替换。服务可以在没有模型时启动，但正式审查需要模型，不会静默降级为规则报告。离线机制测试无需模型凭据。
 
 ```bash
-python -m evoagent
+python -m govern
 ```
 
 打开 `http://127.0.0.1:8080/`，健康检查为 `GET /health`。本地默认数据库为 `evoagent.db`，队列为进程内实现。根目录 `.env` 会自动读取，实际进程环境变量优先；修改配置后需重启。

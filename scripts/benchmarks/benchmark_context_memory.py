@@ -10,14 +10,14 @@ import time
 
 
 ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+if str(ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "src"))
 
-from evoagent.evaluation.compression_eval import CompressionCase, CompressionEvaluation
-from evoagent.memory.context_manager import ContextManager
-from evoagent.memory.memory import MemoryManager
-from evoagent.memory.memory_governance import MemoryStatus
-from evoagent.storage.store import TaskStore
+from govern.evaluation.compression_eval import CompressionCase, CompressionEvaluation
+from govern.memory.context_manager import ContextManager
+from govern.memory.memory import MemoryManager
+from govern.memory.memory_governance import MemoryStatus
+from govern.storage.store import TaskStore
 
 
 def load_cases(dataset: Path, case_count: int, bundle_size: int):

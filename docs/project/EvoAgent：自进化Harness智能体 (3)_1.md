@@ -1087,7 +1087,7 @@ flowchart TD
 |[evoagent/runtime/runtime.py]<br>(../evoagent/runtime/runtime.py)|外层节点 Runtime、步骤和墙钟预算、节点重试、取消检<br>查、Tool Registry|
 |[evoagent/runtime/harness.py]<br>(../evoagent/runtime/harness.py)|业务状态机、Planning/Executing/Reviewing三节点、报告<br>组装和外层 checkpoint|
 |[evoagent/agents/repository_tools.py]<br>(../evoagent/agents/repository_tools.py)|Diff、仓库、符号、AST、Git、Scanner和测试工具|
-|[evoagent/agents/gates.py](<../../evoagent/agents/gates.py>)|Finding格式、证据、置信度和发布门禁|
+|[evoagent/agents/gates.py](<../../src/govern/review/gates.py>)|Finding格式、证据、置信度和发布门禁|
 |||
 
 <!-- 原 PDF 第 28 页 -->
@@ -1793,23 +1793,23 @@ Trace 按角色保存事件，例如：
 
 建议按实际调用方向阅读：
 
-1. [evoagent/application/service.py](<../../evoagent/application/service.py>)：看 ModeRouter 如何组装，以及角色和 Prompt
+1. [evoagent/application/service.py](<../../src/govern/api/service.py>)：看 ModeRouter 如何组装，以及角色和 Prompt
 
 从哪里来。
 
-2. [evoagent/runtime/harness.py](<../../evoagent/runtime/harness.py>)：看一次任务如何进入 executing。
+2. [evoagent/runtime/harness.py](<../../src/govern/runtime/harness.py>)：看一次任务如何进入 executing。
 
-3. [evoagent/agents/agentic_core.py](<../../evoagent/agents/agentic_core.py>)：先读四个 Prompt 和权限表，再读
+3. [evoagent/agents/agentic_core.py](<../../src/govern/review/agentic_core.py>)：先读四个 Prompt 和权限表，再读
 
 BoundedRole，最后顺着 _agentic() 看完整会话。
 
-4. [evoagent/agents/repository_tools.py](<../../evoagent/agents/repository_tools.py>)：核对每个工具返回什么证
+4. [evoagent/agents/repository_tools.py](<../../src/govern/review/repository_tools.py>)：核对每个工具返回什么证
 
 据，哪些工具真的隔离执行。
 
-5. [evoagent/agents/gates.py](<../../evoagent/agents/gates.py>)：确认 Lead 之后还有哪些确定性拒绝条件。
+5. [evoagent/agents/gates.py](<../../src/govern/review/gates.py>)：确认 Lead 之后还有哪些确定性拒绝条件。
 
-6. [evoagent/infrastructure/telemetry.py](<../../evoagent/infrastructure/telemetry.py>)：理解报告中的调用数、Token、成本和
+6. [evoagent/infrastructure/telemetry.py](<../../src/govern/infrastructure/telemetry.py>)：理解报告中的调用数、Token、成本和
 
 Trace 从哪里来。
 
@@ -2174,9 +2174,9 @@ EvoAgent 里有三个带 Harness 的，它们解决的问题不同。
 
 ||文件|用途|
 |---|---|---|
-|ReviewHarness<br>|[evoagent/runtime/harness.py]<br>(../../evoagent/runtime/harness.py)|执行一次真实 PR 审查，管理业务状态、Hook、节点预算、重试、Checkpoint、审批暂停、Goal Gate、恢复和报告落库|
-|EndToEndEvaluatio<br>nHarness|[evoagent/evaluation/evaluation_harness.py]<br>(../../evoagent/evaluation_harness.<br>py)|回放带人工真值的样本，计算 Precision、<br>Recall、F1、修复通过率等离线指标|
-|ProductionEvaluatio<br>nHarness|[evoagent/evaluation/evaluation_v2.py]<br>(../../evoagent/evaluation/evaluation_v2.py)|在基础评测上增加模型调用、Token、成本、<br>延迟、精确位置和证据统计|
+|ReviewHarness<br>|[evoagent/runtime/harness.py]<br>(../../src/govern/runtime/harness.py)|执行一次真实 PR 审查，管理业务状态、Hook、节点预算、重试、Checkpoint、审批暂停、Goal Gate、恢复和报告落库|
+|EndToEndEvaluatio<br>nHarness|[evoagent/evaluation/evaluation_harness.py]<br>(../../src/govern/evaluation_harness.<br>py)|回放带人工真值的样本，计算 Precision、<br>Recall、F1、修复通过率等离线指标|
+|ProductionEvaluatio<br>nHarness|[evoagent/evaluation/evaluation_v2.py]<br>(../../src/govern/evaluation/evaluation_v2.py)|在基础评测上增加模型调用、Token、成本、<br>延迟、精确位置和证据统计|
 
 <!-- 原 PDF 第 49 页 -->
 
@@ -2216,7 +2216,7 @@ HTTP API / GitHub Webhook
 
 ReviewService 是组合根。它创建 Store、模型客户端、ModeRouterReviewer 和 ReviewHarness， 再把 API、队列和 GitHub Webhook 收到的任务交给同一个 Harness。相关代码在
 
-[evoagent/application/service.py](<../../evoagent/application/service.py>)。
+[evoagent/application/service.py](<../../src/govern/api/service.py>)。
 
 同步和异步路径的区别只在 Harness 之前：
 
@@ -2380,7 +2380,7 @@ resume() 本身没有另一套算法，它只是再次调用 run()。
 
 ### 6. AgentRuntime 怎样执行
 
-[AgentRuntime](<../../evoagent/runtime/runtime.py>) 是一个不依赖第三方工作流框架的顺序节点执行器。核
+[AgentRuntime](<../../src/govern/runtime/runtime.py>) 是一个不依赖第三方工作流框架的顺序节点执行器。核
 
 心算法可以简化为：
 
@@ -2552,9 +2552,9 @@ timeout_seconds 通过 time.monotonic() 计算，并在节点尝试开始前检�
 
 ### 9. 持久化和可观测性
 
-SQLite 的 [TaskStore](<../../evoagent/storage/store.py>) 和 PostgreSQL 的 [PostgresTaskStore]
+SQLite 的 [TaskStore](<../../src/govern/storage/store.py>) 和 PostgreSQL 的 [PostgresTaskStore]
 
-(../../evoagent/storage/postgres_store.py) 都提供 Harness 需要的同一组接口。
+(../../src/govern/storage/postgres_store.py) 都提供 Harness 需要的同一组接口。
 
 和 Harness 直接相关的持久化对象包括：
 
@@ -2734,27 +2734,27 @@ ProductArmReviewer 复用了生产 Reviewer 引擎，但没有经过 ReviewHarne
 
 建议按这个顺序阅读：
 
-1. [evoagent/runtime/harness.py](<../../evoagent/runtime/harness.py>)，先掌握三节点和业务状态。
+1. [evoagent/runtime/harness.py](<../../src/govern/runtime/harness.py>)，先掌握三节点和业务状态。
 
-2. [evoagent/runtime/runtime.py](<../../evoagent/runtime/runtime.py>)，看 checkpoint、预算、取消和重试算法。
+2. [evoagent/runtime/runtime.py](<../../src/govern/runtime/runtime.py>)，看 checkpoint、预算、取消和重试算法。
 
-3. [evoagent/application/service.py](<../../evoagent/application/service.py>)，看同步、异步、Webhook 和恢复怎样进入
+3. [evoagent/application/service.py](<../../src/govern/api/service.py>)，看同步、异步、Webhook 和恢复怎样进入
 
 Harness。
 
-4. [evoagent/agents/agentic_core.py](<../../evoagent/agents/agentic_core.py>)，看 executing 内部的 Lead、
+4. [evoagent/agents/agentic_core.py](<../../src/govern/review/agentic_core.py>)，看 executing 内部的 Lead、
 
 Worker、Critic 和 session checkpoint。
 
-5. [evoagent/agents/gates.py](<../../evoagent/agents/gates.py>)，看最终 Finding 的硬门禁。
+5. [evoagent/agents/gates.py](<../../src/govern/review/gates.py>)，看最终 Finding 的硬门禁。
 
-6. [evoagent/storage/store.py](<../../evoagent/storage/store.py>) 和 [evoagent/storage/postgres_store.py]
+6. [evoagent/storage/store.py](<../../src/govern/storage/store.py>) 和 [evoagent/storage/postgres_store.py]
 
-(../../evoagent/storage/postgres_store.py)，看任务、Trace 和 checkpoint 如何持久化。
+(../../src/govern/storage/postgres_store.py)，看任务、Trace 和 checkpoint 如何持久化。
 
-7. [evoagent/evaluation/evaluation_harness.py](<../../evoagent/evaluation/evaluation_harness.py>) 和
+7. [evoagent/evaluation/evaluation_harness.py](<../../src/govern/evaluation/evaluation_harness.py>) 和
 
-[evoagent/evaluation/evaluation_v2.py](<../../evoagent/evaluation/evaluation_v2.py>)，最后区分生产执行与离线评
+[evoagent/evaluation/evaluation_v2.py](<../../src/govern/evaluation/evaluation_v2.py>)，最后区分生产执行与离线评
 
 测。
 
@@ -4102,7 +4102,7 @@ output/agentic-evaluation/evaluation.json
 
 - [scripts/evaluation/run_agentic_evaluation.py](<../../scripts/evaluation/run_agentic_evaluation.py>)
 
-- [evoagent/evaluation/evaluation_harness.py](<../../evoagent/evaluation/evaluation_harness.py>)
+- [evoagent/evaluation/evaluation_harness.py](<../../src/govern/evaluation/evaluation_harness.py>)
 
 - [Context/Memory v2 基准报告](<../benchmarks/context_memory_benchmark.json>)
 

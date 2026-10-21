@@ -32,7 +32,7 @@ python scripts/start_govern.py
 ## 启动
 
 Python 3.10+、Git、Ripgrep、Node 22.19+、pnpm。Windows运行验证需要Docker Desktop **Linux containers**。
-建议独立venv，不覆盖已有Govern或EvoAgent全局安装。新版发行包为`govern-review-harness`、命令为`govern-harness`（启动Web服务），不覆盖原`govern-agent`包和`govern` CLI；也可按下文使用`python -m evoagent`。
+建议独立venv，不覆盖已有Govern或EvoAgent全局安装。新版发行包为`govern-review-harness`、命令为`govern-harness`（启动Web服务），不覆盖原`govern-agent`包和`govern` CLI；也可按下文使用`python -m govern`。
 
 ```powershell
 cd 'D:\harness code\evoAgent'
@@ -50,23 +50,39 @@ $env:EVOAGENT_LLM_PROVIDER = 'custom'
 $env:EVOAGENT_LLM_BASE_URL = 'https://your-provider.example/v1'
 $env:EVOAGENT_LLM_API_KEY = 'set-locally'
 $env:EVOAGENT_LLM_MODEL = 'your-model'
-.\.venv\Scripts\python -m evoagent
+.\.venv\Scripts\python -m govern
 ```
 
 先把`govern.config.example.json`复制成本地配置，修改Jira工具映射和模型单价。示例工具名是**适配占位符**，不是任何MCP产品的保证接口。无Jira时可删除`jira`配置，跳过需求选择；不伪造业务一致性验证。
-前端默认`http://127.0.0.1:8080`，原界面在`/legacy`。沿用EVOAGENT环境变量兼容旧部署。Python源目录仍为EvoAgent，产品入口与新页面是Govern。
+前端默认`http://127.0.0.1:8080`，原界面在`/legacy`。沿用EVOAGENT环境变量兼容旧部署。Python源目录统一为`src/govern`，按职责整合，不再依赖旧包路径。
 `GOVERN_NODE`可以显式指定新版node.exe。未配置真实模型时任务明确失败，不输出伪造审查。
 
 ## 代码结构与执行契约
 
-- `EvoAgent/govern/repository.py`：Git四范围与内容快照、Python AST、可选JS/TS Tree-sitter、逐行ChangeUnit。删除用base定位；大符号按120行分片，保留全部变更行。引用为有上限的词法候选，不宣称精确调用图。
+### src 布局整合（2026-10-21）
+
+Python 源码统一放在 `src/govern`，不保留 `EvoAgent/` 或旧包名导入桥接。
+原审查角色与仓库分析并入 `review`；HTTP 服务并入 `api`；策略片段及候选治理并入 `policy`；
+Pi 桥接及运行验证并入 `runtime`；Jira MCP 并入 `integrations`。
+`skills/` 只保留 Markdown 策略资源，加载器代码位于 `src/govern/skills`。
+
+启动脚本、editable 安装、Docker 源码挂载、维护与评测脚本均已适配。
+资源根目录由 `govern.core.paths.project_root()` 统一解析，部署时可用 `GOVERN_ROOT` 指定；
+不依赖调用者的当前目录。既有 `EVOAGENT_*` 配置键及持久化标记保留兼容，来源见 `THIRD_PARTY_NOTICES.md`。
+
+本次验收：Python 155 项（143 通过、12 条件跳过，包含 4 项真实 Docker 合成测试），
+Pi 6 项通过，TypeScript 类型检查与 Vue 生产构建通过；本地服务已用新源码重启。
+7 个 Vue 页面可打开，无浏览器控制台错误；配置、策略、候选、任务列表及健康接口返回 200。
+未运行真实模型代码审查，未以应用源码仓库作为审查测试目标。
+
+- `src/govern/review/repository.py`：Git四范围与内容快照、Python AST、可选JS/TS Tree-sitter、逐行ChangeUnit。删除用base定位；大符号按120行分片，保留全部变更行。引用为有上限的词法候选，不宣称精确调用图。
 - `workbench.py`：复用任务、队列、Artifact、Checkpoint和效果账本。branch解析merge-base，range固定两侧Commit；staged/working-tree使用内容Hash，绝不把未提交内容称为Commit SHA。GitHub公共PR固定两侧SHA，独立缓存，不切换用户分支。
-- `jira.py`：标准MCP客户端、分页获取Epic及子需求，用户选择后冻结；Mapper不得任意搜索其他Issue。外链正文未读取会显示限制。自定义Jira工具返回值需要符合示例规范。
-- `policy.py`：公共证据规则、独立P级与严重性、六个阶段片段；策略哈希和模型身份随任务冻结。没有核心业务画像时P级待确认，不按模块名称猜测。
+- `src/govern/integrations/jira_mcp.py`：标准MCP客户端、分页获取Epic及子需求，用户选择后冻结；Mapper不得任意搜索其他Issue。外链正文未读取会显示限制。自定义Jira工具返回值需要符合示例规范。
+- `src/govern/policy/bundle.py`：公共证据规则、独立P级与严重性、六个阶段片段；策略哈希和模型身份随任务冻结。没有核心业务画像时P级待确认，不按模块名称猜测。
 - `pi-runtime/src/runtime.ts`：六阶段DAG；各角色实际创建隔离的Pi AgentSession；三领域并行，阶段间只传结构化产物。单Unit形成Slice，跨Slice在Synthesizer汇总；尚不是全语言精确行为/调用图切分器。
 - `pi-runtime/patches/govern-core.patch`：固定Pi源码Commit，小范围Core补丁实现共享Token预留/结算、Turn和工具上限；受控子任务深度1、并发2、无宿主Shell、不能再委派。父子共用Core预算，取消传播。恢复任务继承已用预算，不重新增发。
 - `verification.py`：仅Validator可调用`run_verification`；Profile由服务端登记，Agent不能指定命令、宿主路径、Docker参数或凭证。测试导入、收集与执行均在Docker中。Docker不可用不回退宿主执行。
-- `evolution.py`：反馈归因生成角色片段候选；保护评测仓库/diff；相同Pi流程评测；复用候选租约、审批、shadow、CAS发布指针和回滚。模型只能改阶段指导，不能改公共证据/风险/权限规则。
+- `src/govern/policy/feedback_evolution.py`：反馈归因生成角色片段候选；保护评测仓库/diff；相同Pi流程评测；复用候选租约、审批、shadow、CAS发布指针和回滚。模型只能改阶段指导，不能改公共证据/风险/权限规则。
 
 ## 审查文档固定八项
 

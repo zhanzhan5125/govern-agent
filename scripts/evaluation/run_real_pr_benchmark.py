@@ -5,11 +5,11 @@ import os
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-if ROOT not in sys.path:
-    sys.path.insert(0, ROOT)
+if os.path.join(ROOT, "src") not in sys.path:
+    sys.path.insert(0, os.path.join(ROOT, "src"))
 
-from evoagent.evaluation.evaluation_harness import load_jsonl  # noqa: E402
-from evoagent.evaluation.evaluation_v2 import validate_real_dataset  # noqa: E402
+from govern.evaluation.evaluation_harness import load_jsonl  # noqa: E402
+from govern.evaluation.evaluation_v2 import validate_real_dataset  # noqa: E402
 
 
 def main():

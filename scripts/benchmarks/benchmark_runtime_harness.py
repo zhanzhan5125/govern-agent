@@ -15,14 +15,14 @@ import time
 
 
 ROOT = str(Path(__file__).resolve().parents[2])
-if ROOT not in sys.path:
-    sys.path.insert(0, ROOT)
+if os.path.join(ROOT, "src") not in sys.path:
+    sys.path.insert(0, os.path.join(ROOT, "src"))
 
-from evoagent.runtime.artifacts import ArtifactOffloadHook, ArtifactStore  # noqa: E402
-from evoagent.runtime.hooks import HookPipeline, HookPoint, HookRegistration  # noqa: E402
-from evoagent.runtime.journal import EffectExecutor  # noqa: E402
-from evoagent.runtime.runtime import AgentRuntime, AgentTool, RuntimeNode, ToolRegistry  # noqa: E402
-from evoagent.storage.store import TaskStore  # noqa: E402
+from govern.runtime.artifacts import ArtifactOffloadHook, ArtifactStore  # noqa: E402
+from govern.runtime.hooks import HookPipeline, HookPoint, HookRegistration  # noqa: E402
+from govern.runtime.journal import EffectExecutor  # noqa: E402
+from govern.runtime.runtime import AgentRuntime, AgentTool, RuntimeNode, ToolRegistry  # noqa: E402
+from govern.storage.store import TaskStore  # noqa: E402
 
 
 def percentile(values, fraction):

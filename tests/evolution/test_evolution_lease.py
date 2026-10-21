@@ -3,9 +3,9 @@ import os
 import tempfile
 import unittest
 
-from evoagent.evolution.candidate_policy import CandidateConflict, CandidatePolicy
-from evoagent.evolution.evolution_lease import replay_lease
-from evoagent.storage.store import TaskStore
+from govern.policy.candidate_policy import CandidateConflict, CandidatePolicy
+from govern.policy.evolution_lease import replay_lease
+from govern.storage.store import TaskStore
 
 
 class ReplayLeaseContract:

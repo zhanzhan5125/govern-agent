@@ -3,15 +3,15 @@ import os
 import tempfile
 import unittest
 
-from evoagent.agents.agentic_core import ModeRouterReviewer
-from evoagent.core.config import Settings
-from evoagent.core.diff_parser import parse_unified_diff
-from evoagent.evaluation.evaluation_v2 import validate_real_dataset
-from evoagent.evolution.evolution_v2 import RootCauseEvolutionGenerator
-from evoagent.repair.patching import apply_file_patch, parse_unified_patch
-from evoagent.application.service import ReviewService
-from evoagent.storage.store import TaskStore
-from evoagent.repair.verifier import RepairVerifier
+from govern.review.agentic_core import ModeRouterReviewer
+from govern.core.config import Settings
+from govern.core.diff_parser import parse_unified_diff
+from govern.evaluation.evaluation_v2 import validate_real_dataset
+from govern.policy.evolution_v2 import RootCauseEvolutionGenerator
+from govern.repair.patching import apply_file_patch, parse_unified_patch
+from govern.api.service import ReviewService
+from govern.storage.store import TaskStore
+from govern.repair.verifier import RepairVerifier
 
 
 DIFF = "--- a/app.py\n+++ b/app.py\n@@ -1 +1 @@\n-old\n+eval(user_input)\n"

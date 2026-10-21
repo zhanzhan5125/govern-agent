@@ -4,8 +4,8 @@ import os
 import unittest
 import uuid
 
-from evoagent.evolution.candidate_policy import CandidateConflict, CandidatePolicy
-from evoagent.storage.postgres_store import PostgresTaskStore
+from govern.policy.candidate_policy import CandidateConflict, CandidatePolicy
+from govern.storage.postgres_store import PostgresTaskStore
 from tests.memory.test_memory_experience import MemoryExperienceContract
 from tests.evolution.test_evolution_lease import ReplayLeaseContract
 

@@ -2,20 +2,20 @@ import os
 import tempfile
 import unittest
 
-from evoagent.runtime.artifacts import ArtifactOffloadHook, ArtifactStore
-from evoagent.agents.agentic_core import BoundedRole
-from evoagent.runtime.goal_gate import ReviewGoalGate, RuntimeGoalNotMet
-from evoagent.runtime.harness import ReviewHarness
-from evoagent.runtime.hooks import (
+from govern.runtime.artifacts import ArtifactOffloadHook, ArtifactStore
+from govern.review.agentic_core import BoundedRole
+from govern.runtime.goal_gate import ReviewGoalGate, RuntimeGoalNotMet
+from govern.runtime.harness import ReviewHarness
+from govern.runtime.hooks import (
     ApprovalHook, HookAction, HookPipeline, HookPoint, HookRegistration,
     HookResult, RuntimeApprovalRequired, RuntimeHookBlocked, RuntimeHookError,
 )
-from evoagent.runtime.journal import EffectExecutor
-from evoagent.core.models import Finding, Severity
-from evoagent.agents.reviewer import LocalRuleReviewer
-from evoagent.runtime.runtime import AgentRuntime, AgentTool, RuntimeNode, ToolRegistry
-from evoagent.storage.store import TaskStore
-from evoagent.infrastructure.telemetry import ExecutionLedger
+from govern.runtime.journal import EffectExecutor
+from govern.core.models import Finding, Severity
+from govern.review.reviewer import LocalRuleReviewer
+from govern.runtime.runtime import AgentRuntime, AgentTool, RuntimeNode, ToolRegistry
+from govern.storage.store import TaskStore
+from govern.infrastructure.telemetry import ExecutionLedger
 
 
 DIFF = "--- a/x.py\n+++ b/x.py\n@@ -1 +1 @@\n-old\n+eval(value)\n"

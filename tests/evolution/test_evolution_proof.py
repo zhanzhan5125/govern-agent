@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from evoagent.evaluation.evolution_proof import (
+from govern.evaluation.evolution_proof import (
     generate_prompt_evolution_cases,
     run_prompt_evolution_proof,
     write_jsonl,

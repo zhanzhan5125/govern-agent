@@ -3,17 +3,17 @@ import os
 import tempfile
 import unittest
 
-from evoagent.runtime.artifacts import ArtifactStore
-from evoagent.evaluation.compression_eval import CompressionCase, CompressionEvaluation
-from evoagent.memory.context_manager import ContextManager, estimate_tokens
-from evoagent.runtime.evidence import EvidenceCaptureHook, EvidenceStore
-from evoagent.runtime.hooks import HookPipeline, HookPoint, HookRegistration
-from evoagent.memory.memory import MemoryManager
-from evoagent.memory.memory_governance import (
+from govern.runtime.artifacts import ArtifactStore
+from govern.evaluation.compression_eval import CompressionCase, CompressionEvaluation
+from govern.memory.context_manager import ContextManager, estimate_tokens
+from govern.runtime.evidence import EvidenceCaptureHook, EvidenceStore
+from govern.runtime.hooks import HookPipeline, HookPoint, HookRegistration
+from govern.memory.memory import MemoryManager
+from govern.memory.memory_governance import (
     MemoryStatus, MemoryTransitionError, MemoryVersionConflict,
 )
-from evoagent.runtime.runtime import AgentTool, ToolRegistry
-from evoagent.storage.store import TaskStore
+from govern.runtime.runtime import AgentTool, ToolRegistry
+from govern.storage.store import TaskStore
 
 
 DIFF = """--- a/src/auth.py
