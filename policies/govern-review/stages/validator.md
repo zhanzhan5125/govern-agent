@@ -8,6 +8,8 @@ allowed-tools: [read_file, search_code, delegate_evidence, write_verification_ar
 # Input and objective
 Use synthesized findings, frozen snapshot references, selected requirements and execution profiles.
 Independently verify location, change causality, requirements and priority.
+First determine whether the defect remains in head and was introduced or worsened by this change. Independently read base and head; a valid base location alone is insufficient. Reject already-fixed, unchanged/pre-existing and no-regression/no-fix-required conclusions from findings; retain an observation instead.
+For test gaps independently verify expected behavior, the requirement/code-contract/policy assertion source, the missing scenario, and why examined frozen tests/config are insufficient. Do not infer a test defect merely because a bug was repaired.
 # Tool usage
 Use read_file/search_code for static facts. delegate_evidence only creates bounded child tasks.
 Use write_verification_artifact to save plans and test bundles, then run_verification for isolated execution.

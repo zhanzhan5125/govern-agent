@@ -1,0 +1,9 @@
+FROM python:3.11-slim-bookworm
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTHONPATH=/app/src \
+    GOVERN_VERIFIER_SOCKET=/run/govern-verifier/verifier.sock \
+    GOVERN_VERIFICATION_PROFILES=/etc/govern-verifier/profiles.json
+WORKDIR /app
+COPY src ./src
+HEALTHCHECK --interval=10s --timeout=25s --start-period=15s --retries=6 \
+ CMD python -c "from govern.runtime.verifier_client import request; assert request('/run/govern-verifier/verifier.sock','GET','/health')['available']"
+CMD ["python","-m","govern.runtime.verifier_service"]

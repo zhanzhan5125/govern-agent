@@ -23,7 +23,7 @@ class AutomaticEvolutionTests(unittest.TestCase):
 
     def add_feedback(self,name,stage='security',kind='false_positive',tenant='default'):
         store=self.w.store;store.create(name,'live-'+name,None,{'govern':True},tenant_id=tenant)
-        with store._connect() as conn:conn.execute("UPDATE tasks SET state='SUCCESS' WHERE id=?",(name,))
+        with store._connect() as conn:store._candidate_execute(conn,"UPDATE tasks SET state='SUCCESS' WHERE id=?",(name,))
         f={'feedback_id':name,'type':kind,'source_stage':stage,'reason_code':'insufficient_evidence',
            'reason':'Confirmed wrong assumption','finding':{'finding_id':'F-'+name,'source_stage':stage,'path':'a.py','line':1}}
         store.save_checkpoint(name,'govern-feedback',{'history':[f]},'completed')

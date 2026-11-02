@@ -54,7 +54,7 @@ $env:EVOAGENT_LLM_MODEL = 'your-model'
 ```
 
 先把`govern.config.example.json`复制成本地配置，修改Jira工具映射和模型单价。示例工具名是**适配占位符**，不是任何MCP产品的保证接口。无Jira时可删除`jira`配置，跳过需求选择；不伪造业务一致性验证。
-前端默认`http://127.0.0.1:8080`，原界面在`/legacy`。沿用EVOAGENT环境变量兼容旧部署。Python源目录统一为`src/govern`，按职责整合，不再依赖旧包路径。
+前端默认`http://127.0.0.1:8080`，只提供Vue控制台，构建产物位于`web/app`。Python源目录统一为`src/govern`，按职责整合。
 `GOVERN_NODE`可以显式指定新版node.exe。未配置真实模型时任务明确失败，不输出伪造审查。
 
 ## 代码结构与执行契约

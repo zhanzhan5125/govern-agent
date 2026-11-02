@@ -251,7 +251,7 @@ class RuntimeHarnessV2Tests(unittest.TestCase):
             artifacts.get(reference["artifact_id"], "tenant-b")
 
         with self.store._connect() as conn:
-            conn.execute(
+            self.store._candidate_execute(conn,
                 "UPDATE runtime_artifacts SET content='tampered' WHERE id=?",
                 (reference["artifact_id"],),
             )

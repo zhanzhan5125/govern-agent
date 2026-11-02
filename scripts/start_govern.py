@@ -11,12 +11,24 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
 
 
+def configure_storage(mode):
+    if mode == 'sqlite':
+        os.environ['EVOAGENT_DATABASE_URL']=''
+        return
+    url=os.environ.get('GOVERN_DATABASE_URL') or os.environ.get('EVOAGENT_DATABASE_URL','')
+    if not url.startswith(('postgres://','postgresql://')):
+        raise ValueError('PostgreSQL模式需要通过GOVERN_DATABASE_URL配置有效连接串；不会回退SQLite')
+    os.environ['EVOAGENT_DATABASE_URL']=url
+
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--port',type=int,default=8080)
+    parser.add_argument('--storage',choices=['sqlite','postgres'],default='sqlite',help='Local SQLite by default; PostgreSQL reads GOVERN_DATABASE_URL without saving credentials')
     parser.add_argument('--model-env',help='Explicit existing project .env to import; values are never printed')
     parser.add_argument('--verification-image',default='')
     args=parser.parse_args()
+    configure_storage(args.storage)
     os.chdir(ROOT)
     config_path=ROOT/'.govern/config.json';config_path.parent.mkdir(exist_ok=True)
     config=json.loads(config_path.read_text(encoding='utf-8')) if config_path.exists() else {}

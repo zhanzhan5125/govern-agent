@@ -125,25 +125,13 @@ class ApiHandler(BaseHTTPRequestHandler):
         path = parsed_url.path
         query = urllib.parse.parse_qs(parsed_url.query)
         if path == "/":
-            self._serve_file("app/index.html" if os.path.isfile(os.path.join(WEB_ROOT,"app/index.html")) else "govern.html")
+            if not os.path.isfile(os.path.join(WEB_ROOT,'app/index.html')):
+                self._send_json(503,{'error':'前端未构建：请在 frontend 目录执行 npm ci 和 npm run build'})
+                return
+            self._serve_file('app/index.html')
             return
         if path.startswith('/app/'):
             self._serve_file(path.lstrip('/'))
-            return
-        if path == "/legacy":
-            self._serve_file("index.html")
-            return
-        if path in {"/assets/govern.js", "/assets/govern.css"}:
-            self._serve_file(path.rsplit("/", 1)[1])
-            return
-        if path == "/assets/app.css":
-            self._serve_file("app.css")
-            return
-        if path == "/assets/login.css":
-            self._serve_file("login.css")
-            return
-        if path == "/assets/app.js":
-            self._serve_file("app.js")
             return
         if path == "/health":
             mode = resolve_mode(
@@ -177,7 +165,9 @@ class ApiHandler(BaseHTTPRequestHandler):
             if not principal.can("manage"):
                 self._send_json(403, {"error":"permission denied"})
                 return
-            self._send_json(200, {"candidates": [x for x in self.service.store.list_evolution_candidates(principal.tenant_id) if x["name"] == "govern-review"],
+            self._send_json(200, {"candidates": [x for x in self.service.store.list_evolution_candidates(principal.tenant_id,200) if x["name"] == "govern-review"],
+                "batches": self.service.store.list_govern_evolution_batches(principal.tenant_id),
+                "default_release": self.service.store.govern_default_release(principal.tenant_id),
                 "dataset": self.service.govern.evolution.dataset.summary(),
                 "release": self.service.store.evolution_release_head(principal.tenant_id,"skill","govern-review")})
             return
@@ -405,11 +395,13 @@ class ApiHandler(BaseHTTPRequestHandler):
             if path.startswith('/v1/govern/settings'):
                 self._principal('manage')
                 origin=self.headers.get('Origin')
-                if self.client_address[0] not in {'127.0.0.1','::1'} or (origin and urllib.parse.urlsplit(origin).netloc != self.headers.get('Host')):
+                from govern.core.operator_settings import settings_request_allowed
+                if not settings_request_allowed(self.client_address[0],self.headers.get('Host',''),origin):
                     raise PermissionError('配置接口仅支持本机同源访问')
-                from govern.core.operator_settings import save_settings,test_model
+                from govern.core.operator_settings import save_settings,test_model,test_github
                 if path == '/v1/govern/settings':self._send_json(200,save_settings(self.service.govern,self._read_json(body)));return
                 if path == '/v1/govern/settings/test-model':self._send_json(200,test_model(self.service.govern));return
+                if path == '/v1/govern/settings/test-github':self._send_json(200,test_github(self.service.govern,self._read_json(body)));return
                 if path == '/v1/govern/settings/test-jira':
                     client=self.service.govern.jira.client
                     if not client:raise ValueError('尚未配置Jira MCP')
@@ -472,18 +464,26 @@ class ApiHandler(BaseHTTPRequestHandler):
                     'base_sha':snapshot['base_sha'],'head_sha':snapshot['head_sha'],'changed_paths':snapshot['changed_paths'],
                     'change_units':len(change_units(snapshot)),'omitted_files':snapshot['omitted_files']})
                 return
+            if path == '/v1/govern/policy/restore-default':
+                principal=self._principal('manage');payload=self._read_json(body)
+                generation=payload.get('expected_generation')
+                if isinstance(generation,bool) or not isinstance(generation,int):raise ValueError('expected_generation required')
+                self._send_json(200,self.service.store.restore_govern_default(principal.tenant_id,generation,principal.username))
+                return
             if path == "/v1/govern/evolve":
                 principal = self._principal("manage")
                 self._send_json(201, self.service.govern.evolution.generate(principal.tenant_id, principal.username))
                 return
-            govern_action = re.fullmatch(r"/v1/govern/candidates/([0-9a-f-]+)/(evaluate|approve|reject|shadow|activate|rollback)", path)
+            govern_action = re.fullmatch(r"/v1/govern/candidates/([0-9a-f-]+)/(evaluate|approve|reject|activate|rollback)", path)
             if govern_action:
                 principal = self._principal("manage"); payload = self._read_json(body)
                 candidate, action = govern_action.groups(); pipeline = self.service.govern.evolution
                 revision = payload.get("expected_revision")
                 if isinstance(revision, bool) or not isinstance(revision, int): raise ValueError("expected_revision required")
-                if action in {"evaluate", "shadow"}: result = getattr(pipeline, action)(candidate, principal.tenant_id, revision)
+                if action == "evaluate": result = pipeline.evaluate(candidate, principal.tenant_id, revision)
                 elif action == "rollback": result = pipeline.rollback(candidate, principal.tenant_id, revision, payload["expected_generation"], principal.username, payload.get("reason", "User requested rollback"))
+                elif action=='activate' and os.environ.get('GOVERN_LOCAL_TEST_RELEASES')=='1' and (self.service.store.get_evolution_candidate(candidate,principal.tenant_id) or {}).get('lineage',{}).get('source')=='local-integration-fixture':
+                    result=self.service.store.publish_evolution_candidate(candidate,principal.tenant_id,revision,payload['expected_generation'],principal.username,payload.get('reason','Local test publication'),local_test=True)
                 else: result = getattr(pipeline, action)(candidate, principal.tenant_id, revision, principal.username, payload.get("reason", "User requested " + action))
                 self._send_json(200, result)
                 return

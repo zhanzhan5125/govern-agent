@@ -11,9 +11,9 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
 PUBLIC_DIRS = ('src', 'tests', 'scripts', 'docs', 'data', 'policies', 'web', 'frontend', 'pi-runtime')
-PUBLIC_FILES = ('README.md', 'requirements.txt', 'Dockerfile', 'docker-compose.yml',
+PUBLIC_FILES = ('README.md', 'requirements.txt', 'Dockerfile.govern', 'Dockerfile.verifier', 'compose.govern.yaml',
                 '.env.example', '.gitignore', '.dockerignore', 'evolution-data/README.md',
-                'pyproject.toml', 'GOVERN_IMPLEMENTATION.md', 'THIRD_PARTY_NOTICES.md')
+                'pyproject.toml', 'govern.config.example.json', 'GOVERN_IMPLEMENTATION.md', 'THIRD_PARTY_NOTICES.md')
 EXCLUDED_DIRS = {'.venv', 'venv', '__pycache__', '.git', '.idea', '.vscode',
                  'node_modules', '.pytest_cache', '.mypy_cache', '.ruff_cache', 'vendor', '.govern'}
 

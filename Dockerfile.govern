@@ -1,0 +1,53 @@
+FROM node:24-bookworm-slim AS frontend
+WORKDIR /build/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/src ./src
+COPY frontend/index.html frontend/vite.config.js ./
+RUN npm run build
+
+FROM node:24-bookworm-slim AS pi
+WORKDIR /build/pi-runtime
+RUN npm install --global pnpm@10.11.0
+COPY pi-runtime/package.json pi-runtime/pnpm-lock.yaml pi-runtime/pnpm-workspace.yaml ./
+COPY pi-runtime/vendor/pi/packages/agent/package.json ./vendor/pi/packages/agent/package.json
+RUN pnpm install --frozen-lockfile
+# Source is the pinned upstream plus patches/govern-core.patch, verified by setup.mjs.
+COPY pi-runtime/vendor/pi/packages/agent/src ./vendor/pi/packages/agent/src
+COPY pi-runtime/src ./src
+COPY pi-runtime/tsconfig.json pi-runtime/tsconfig.core.json pi-runtime/UPSTREAM.json ./
+COPY pi-runtime/patches ./patches
+RUN pnpm build:core && pnpm check
+COPY pi-runtime/vendor/pi/LICENSE ./LICENSE.pi
+
+FROM python:3.11-slim-bookworm
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 GOVERN_ROOT=/app \
+    GOVERN_CONFIG=/var/lib/govern/config.json GOVERN_NODE=/usr/local/bin/node \
+    EVOAGENT_HOST=0.0.0.0 EVOAGENT_PORT=8080 EVOAGENT_DB_PATH=/var/lib/govern/govern.sqlite \
+    GOVERN_AUTO_EVOLUTION_MODEL_CALLS=0
+WORKDIR /app
+RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get -o Acquire::Retries=3 update \
+    && apt-get -o Acquire::Retries=3 install -y --no-install-recommends git ripgrep ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --uid 10001 govern
+COPY --from=pi /usr/local/bin/node /usr/local/bin/node
+COPY requirements.txt pyproject.toml ./
+COPY src ./src
+# OTLP export is optional; local Trace/metrics and the SDK do not need protobuf.
+RUN pip install --no-cache-dir --retries 3 '.[postgres,analysis,container]'
+COPY web ./web
+COPY --from=frontend /build/web/app ./web/app
+COPY policies ./policies
+COPY THIRD_PARTY_NOTICES.md ./THIRD_PARTY_NOTICES.md
+COPY data/benchmarks/pr_diff_100.jsonl ./data/benchmarks/pr_diff_100.jsonl
+COPY --from=pi /build/pi-runtime ./pi-runtime
+COPY scripts/start_container.py ./scripts/start_container.py
+COPY --from=pi /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+RUN mkdir -p /var/lib/govern /app/evolution-data && chown -R govern:govern /var/lib/govern /app/policies /app/evolution-data
+USER govern
+RUN git config --global --add safe.directory /repositories/project
+EXPOSE 8080
+HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=6 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/',timeout=2)"
+CMD ["python", "scripts/start_container.py"]

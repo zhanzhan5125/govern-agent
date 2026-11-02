@@ -14,6 +14,16 @@ ERROR_TARGETS = {"tool_unavailable": "tool", "permission_denied": "tool",
                  "invalid_label": "dataset"}
 
 
+def feedback_target(reason_code):
+    """Share the legacy engineering routes with stage-scoped feedback generation.
+
+    Repository conventions remain memory, not global policy. Other user-labelled
+    cases still require current snapshot evidence before becoming Skill inputs.
+    """
+    return {**ERROR_TARGETS, 'snapshot_missing':'workflow', 'environment_error':'tool',
+            'repository_convention':'memory', 'project_specific':'memory'}.get(reason_code,'prompt_skill')
+
+
 class FailureDiagnosis:
     def __init__(self, store):
         self.store = store

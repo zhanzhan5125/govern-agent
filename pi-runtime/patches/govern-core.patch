@@ -1,30 +1,50 @@
 diff --git a/packages/agent/src/agent-loop.ts b/packages/agent/src/agent-loop.ts
-index f406aba..21cd4ae 100644
+index f406aba..dfc988d 100644
 --- a/packages/agent/src/agent-loop.ts
 +++ b/packages/agent/src/agent-loop.ts
-@@ -239,7 +239,16 @@ async function runLoop(
- 			}
+@@ -400,13 +400,22 @@ async function streamAssistantResponse(
+ 	const resolvedApiKey =
+ 		(config.getApiKey ? await config.getApiKey(config.model.provider) : undefined) || config.apiKey;
  
- 			// Stream assistant response
--			const message = await streamAssistantResponse(currentContext, config, signal, emit, streamFunction);
-+			const reservation = config.governBudget?.reserve(currentContext.messages, config.maxTokens ?? 2048);
-+            let message: AssistantMessage;
-+            try {
-+                message = await streamAssistantResponse(currentContext, config, signal, emit, streamFunction);
-+                const usage = message.usage;
-+                reservation?.settle(usage ? usage.input + usage.output + usage.cacheRead + usage.cacheWrite : undefined);
-+            } catch (error) {
-+                reservation?.settle();
-+                throw error;
-+            }
- 			newMessages.push(message);
++    // Admit the transformed model input, never the uncompressed conversation.
++    const reservation = await config.governBudget?.reserveAsync(llmContext.messages, config.maxTokens ?? config.model.maxTokens, signal);
++    let actualTokens: number | undefined;
++    try {
+ 	const response = await streamFunction(config.model, llmContext, {
+ 		...config,
+ 		apiKey: resolvedApiKey,
+ 		signal,
+ 	});
+ 	// Record the requested level, whichever stream function answered.
+-	const result = async () => Object.assign(await response.result(), { thinkingLevel: config.reasoning ?? "off" });
++	const result = async () => {
++        const message = Object.assign(await response.result(), { thinkingLevel: config.reasoning ?? "off" });
++        const usage = message.usage;
++        actualTokens = usage.input + usage.output + usage.cacheRead + usage.cacheWrite;
++        return message;
++    };
  
- 			if (message.stopReason === "error" || message.stopReason === "aborted") {
-@@ -714,6 +723,7 @@ async function prepareToolCall(
+ 	let partialMessage: AssistantMessage | null = null;
+ 	let addedPartial = false;
+@@ -466,6 +475,7 @@ async function streamAssistantResponse(
+ 	}
+ 	await emit({ type: "message_end", message: finalMessage });
+ 	return finalMessage;
++    } finally { reservation?.settle(actualTokens); }
+ }
+ 
+ /**
+@@ -714,6 +724,13 @@ async function prepareToolCall(
  	tools: readonly AgentTool<any>[] = currentContext.tools ?? [],
  ): Promise<PreparedToolCall | ImmediateToolCallOutcome> {
  	const tool = tools.find((t) => t.name === toolCall.name);
-+	if ("governBudget" in config) (config as AgentLoopConfig).governBudget?.takeTool();
++	if ("governBudget" in config && (config as AgentLoopConfig).governBudget?.tryTakeTool() === false) {
++		return {
++			kind: "immediate",
++			result: { content: [{ type: "text", text: "Tool not executed: evidence tool budget exhausted. Preserve prior evidence and return final JSON with coverage limitations; do not request more tools." }], details: { govern_budget_denied: true, reason: "tool_limit" } },
++			isError: true,
++		};
++	}
  	if (!tool) {
  		return {
  			kind: "immediate",
@@ -89,7 +109,7 @@ diff --git a/packages/agent/src/govern-budget.ts b/packages/agent/src/govern-bud
 new file mode 100644
 --- /dev/null
 +++ b/packages/agent/src/govern-budget.ts
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,59 @@
 +/** Govern Core extension: one atomic JS budget shared by parent/child loops. */
 +export class SharedBudget {
 +  usedTokens = 0;
@@ -100,12 +120,13 @@ new file mode 100644
 +  readonly started = Date.now();
 +  constructor(readonly limits = { tokens: 120000, turns: 60, tools: 100, milliseconds: 900000 }) {}
 +  check(): void {
-+    if (this.controller.signal.aborted) throw new Error("Govern budget cancelled");
++    if (this.controller.signal.aborted) throw this.controller.signal.reason instanceof Error ? this.controller.signal.reason : new Error("Govern budget cancelled");
 +    if (Date.now() - this.started > this.limits.milliseconds) this.exhaust("time");
 +  }
 +  private exhaust(kind: string): never {
-+    this.controller.abort();
-+    throw new Error(`Govern shared ${kind} budget exhausted`);
++    const error = new Error(`Govern shared ${kind} budget exhausted`);
++    this.controller.abort(error);
++    throw error;
 +  }
 +  reserve(messages: unknown[], output: number): { settle: (actual?: number) => void } {
 +    this.check();
@@ -120,6 +141,27 @@ new file mode 100644
 +      this.usedTokens += actual === undefined ? amount : Math.max(0, actual);
 +      if (this.usedTokens + this.reservedTokens > this.limits.tokens) this.exhaust("token");
 +    }};
++  }
++  async reserveAsync(messages: unknown[], output: number, signal?: AbortSignal): Promise<{ settle: (actual?: number) => void }> {
++    const amount = Math.ceil(JSON.stringify(messages).length / 2) + output;
++    while (true) {
++      this.check();
++      if (signal?.aborted) throw new Error('Govern request cancelled');
++      if (this.usedTokens + amount > this.limits.tokens || !this.reservedTokens ||
++          this.usedTokens + this.reservedTokens + amount <= this.limits.tokens) return this.reserve(messages, output);
++      // Temporary contention is admission backpressure, not global exhaustion.
++      await new Promise(resolve => setTimeout(resolve, 20));
++    }
++  }
++  remainingTools(): number {
++    this.check();
++    return Math.max(0, this.limits.tools - this.tools);
++  }
++  tryTakeTool(): boolean {
++    this.check();
++    if (this.remainingTools() < 1) return false;
++    this.tools++;
++    return true;
 +  }
 +  takeTool(): void {
 +    this.check();

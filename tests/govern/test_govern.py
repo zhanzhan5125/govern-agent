@@ -118,16 +118,26 @@ class GovernTests(unittest.TestCase):
         from govern.api.service import ReviewService
         from govern.policy.feedback_evolution import skill
         self.repo();(self.root/'a.py').write_text('def pay(x):\n    return x+1\n')
-        settings=Settings(host='127.0.0.1',port=0,db_path=str(self.root/'test.db'),max_diff_bytes=100000,max_steps=8,
+        settings=Settings(host='127.0.0.1',port=0,db_path=str(self.root/'test.db'),database_url=getattr(self,'database_url',''),max_diff_bytes=100000,max_steps=8,
             timeout_seconds=10,llm_base_url='http://127.0.0.1:9/v1',llm_api_key='test-only',llm_model='test',
             github_webhook_secret='',github_token='',auto_post_review=False,skills_dir=str(self.root/'no-skills'))
         service=ReviewService(settings)
         class Bridge:
             def run(self,request,tool,event,**kwargs):
+                if request['method']=='run_review':
+                    assert request['context_backend']=='python'
+                    assert request['input']['memories']=={}, 'Historical memory needs separate external-disclosure consent'
+                snapshot=request['input']['snapshot_id'];unit=next(u for u in request['input']['units'] if u['side']=='head')
                 return {'findings':[{'finding_id':'f1','title':'Changed result','path':'a.py','line':2,'side':'head',
+                    'disposition':'actionable','change_causality':{'status':'introduced','change_unit_ids':[unit['change_unit_id']],
+                        'head_evidence_refs':['code://'+snapshot+'/head/a.py#L2'],'base_evidence_refs':['code://'+snapshot+'/base/a.py#L2'],'reasoning':'The changed return violates the existing payment result contract.'},
                     'source_stage':'correctness','severity':'medium','business_priority':None,'source_module':'payments',
                     'related_tests':[],'description':'Result changed','impact_scope':'pay callers','recommendation':'Check contract',
-                    'evidence_refs':['selected-diff'],'runtime_verdict':'not_applicable'}]}
+                    'evidence_refs':['selected-diff'],'runtime_verdict':'not_applicable'},
+                    {'finding_id':'old-fixed','title':'旧版本首次加载覆盖已保存答案','path':'a.py','line':2,'side':'base',
+                     'recommendation':'head 版本修复方案正确：首次加载直接恢复答案。'},
+                    {'finding_id':'no-regression','title':'head 版本与 base 一致，确认无回归','recommendation':'无需修改。'}],
+                    'coverage':{'incomplete_dimensions':[{'dimension':'runtime','reason':'Not executed','evidence_refs':['code://'+snapshot+'/head/a.py#L2']}]}}
         service.govern.bridge=Bridge()
         try:
             with self.assertRaises(PermissionError):service.govern.create({'source':{'path':str(self.root)},'scope':{'mode':'working-tree'}},'default')
@@ -139,6 +149,10 @@ class GovernTests(unittest.TestCase):
                 if row['state'] in {'SUCCESS','FAILED','CANCELLED'}:break
                 time.sleep(.02)
             self.assertEqual('SUCCESS',row['state'],row.get('error'))
+            self.assertEqual(['f1'],[f['finding_id'] for f in row['report']['findings']])
+            self.assertEqual({'fixed_in_head','no_regression'},{f['reason'] for f in row['report']['filtered_findings']})
+            self.assertNotIn('[object Object]',row['report']['report_markdown'])
+            self.assertIn('runtime: Not executed',row['report']['coverage']['incomplete_dimensions'][0])
             for field in compile_bundle()['report_fields']:self.assertIn(field,row['report']['report_markdown'])
             record=service.govern.feedback(run['task_id'],'default',{'type':'false_positive','finding_id':'f1','reason':'Expected by contract'})
             self.assertEqual('correctness',record['source_stage'])
@@ -156,8 +170,12 @@ class GovernTests(unittest.TestCase):
             thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
             base='http://127.0.0.1:%d'%server.server_address[1]
             try:
-                for path in ('/','/assets/govern.js','/assets/govern.css','/v1/govern/policy','/v1/govern/candidates'):
+                for path in ('/','/app/index.html','/v1/govern/policy','/v1/govern/candidates'):
                     with urllib.request.urlopen(base+path,timeout=3) as response:self.assertEqual(200,response.status)
+                import urllib.error
+                for obsolete in ('/legacy','/assets/govern.js','/assets/govern.css','/assets/app.js','/assets/app.css','/assets/login.css'):
+                    with self.assertRaises(urllib.error.HTTPError) as error:urllib.request.urlopen(base+obsolete,timeout=3)
+                    self.assertEqual(404,error.exception.code)
                 with urllib.request.urlopen(base+'/v1/tasks/'+run['task_id']+'/report',timeout=3) as response:
                     document=response.read().decode()
                     for field in compile_bundle()['report_fields']:self.assertIn(field,document)

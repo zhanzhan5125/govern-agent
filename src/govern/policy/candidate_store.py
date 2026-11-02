@@ -89,6 +89,11 @@ class CandidateStoreMixin(MemoryExperienceStoreMixin, EvolutionLeaseStoreMixin):
     def _init_candidates(self):
         with self._candidate_transaction() as conn:
             conn.execute('CREATE TABLE IF NOT EXISTS govern_auto_evolution (tenant_id TEXT PRIMARY KEY,state_json TEXT NOT NULL)')
+            conn.execute('CREATE TABLE IF NOT EXISTS govern_evolution_sequences (tenant_id TEXT PRIMARY KEY, value INTEGER NOT NULL)')
+            conn.execute('''CREATE TABLE IF NOT EXISTS govern_evolution_batches (
+                id TEXT PRIMARY KEY, tenant_id TEXT NOT NULL, version INTEGER NOT NULL,
+                actor TEXT NOT NULL, status TEXT NOT NULL, reason TEXT NOT NULL,
+                created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(tenant_id,version))''')
             self._init_memory_experiences(conn)
             self._init_evolution_leases(conn)
             conn.execute("""CREATE TABLE IF NOT EXISTS evolution_candidates (
@@ -135,6 +140,28 @@ class CandidateStoreMixin(MemoryExperienceStoreMixin, EvolutionLeaseStoreMixin):
         for key in ("content", "baseline", "policy", "lineage", "reports"):
             value[key] = json.loads(value.pop(key + "_json"))
         return value
+
+    def start_govern_evolution_batch(self, tenant, actor):
+        stamp=now(); identifier=str(uuid.uuid4())
+        with self._candidate_transaction() as conn:
+            sequence=self._candidate_execute(conn,'''INSERT INTO govern_evolution_sequences(tenant_id,value)
+                VALUES (?,1) ON CONFLICT(tenant_id) DO UPDATE SET value=govern_evolution_sequences.value+1
+                RETURNING value''',(tenant,)).fetchone()['value']
+            self._candidate_execute(conn,'''INSERT INTO govern_evolution_batches
+                (id,tenant_id,version,actor,status,reason,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)''',
+                (identifier,tenant,sequence,actor,'GENERATING','',stamp,stamp))
+        return {'id':identifier,'version':sequence,'status':'GENERATING','created_at':stamp}
+
+    def finish_govern_evolution_batch(self, identifier, tenant, status, reason=''):
+        if status not in {'GENERATED','NO_CHANGES','FAILED'}:raise ValueError('invalid generation status')
+        with self._candidate_transaction() as conn:
+            self._candidate_execute(conn,'''UPDATE govern_evolution_batches SET status=?,reason=?,updated_at=?
+                WHERE id=? AND tenant_id=? AND status='GENERATING' ''',(status,str(reason)[:500],now(),identifier,tenant))
+
+    def list_govern_evolution_batches(self, tenant):
+        with self._candidate_transaction() as conn:
+            return [dict(row) for row in self._candidate_execute(conn,
+                'SELECT * FROM govern_evolution_batches WHERE tenant_id=? ORDER BY version DESC LIMIT 200',(tenant,)).fetchall()]
 
     def create_evolution_candidate(self, tenant_id, kind, name, content, baseline, policy, lineage, actor):
         if kind not in {"prompt", "skill"} or not all(isinstance(v, str) and v.strip() for v in (tenant_id, name, actor)):
@@ -228,6 +255,28 @@ class CandidateStoreMixin(MemoryExperienceStoreMixin, EvolutionLeaseStoreMixin):
         return dict(row) if row else {"tenant_id": tenant_id, "kind": kind, "name": name,
                                      "candidate_id": None, "generation": 0}
 
+    def govern_default_release(self, tenant_id):
+        """The earliest archived initial configuration, never the previous release."""
+        with self._candidate_transaction() as conn:
+            rows=self._candidate_execute(conn,
+                "SELECT * FROM evolution_candidates WHERE tenant_id=? AND kind='skill' AND name='govern-review' ORDER BY created_at,id",(tenant_id,)).fetchall()
+        default=next((self._decode_candidate(row) for row in rows
+            if json.loads(row['lineage_json']).get('source')=='pre-governance-baseline'),None)
+        head=self.evolution_release_head(tenant_id,'skill','govern-review')
+        return {'candidate_id':default['id'] if default else None,'name':'默认版本',
+                'is_active':head['candidate_id']==(default['id'] if default else None)}
+
+    def restore_govern_default(self, tenant_id, expected_generation, actor):
+        head=self.evolution_release_head(tenant_id,'skill','govern-review')
+        if head['generation']!=expected_generation:raise CandidateConflict('release changed; refresh before restoring default')
+        default=self.govern_default_release(tenant_id)
+        if default['is_active']:return {'changed':False,'default':default}
+        if not default['candidate_id']:raise ValueError('initial policy snapshot is unavailable; refusing to guess a default')
+        candidate=self.get_evolution_candidate(default['candidate_id'],tenant_id)
+        value=self.publish_evolution_candidate(candidate['id'],tenant_id,candidate['revision'],expected_generation,
+            actor,'用户确认恢复默认版本：首次发布前保存的初始策略',rollback=True)
+        return {'changed':True,'candidate_id':value['id'],'default':self.govern_default_release(tenant_id)}
+
     def active_evolution_candidates(self, tenant_id, kind=None):
         sql = ("SELECT c.* FROM evolution_candidates c JOIN evolution_release_heads h "
                "ON c.id=h.candidate_id AND c.tenant_id=h.tenant_id "
@@ -241,7 +290,7 @@ class CandidateStoreMixin(MemoryExperienceStoreMixin, EvolutionLeaseStoreMixin):
         return [self._decode_candidate(row) for row in rows]
 
     def publish_evolution_candidate(self, candidate_id, tenant_id, expected_revision,
-                                    expected_generation, actor, reason, rollback=False):
+                                    expected_generation, actor, reason, rollback=False, *, local_test=False):
         """Atomically change the release pointer, both candidates, and their history.
 
         Forward release requires server-recorded approval and shadow evidence. Rollback
@@ -279,12 +328,25 @@ class CandidateStoreMixin(MemoryExperienceStoreMixin, EvolutionLeaseStoreMixin):
                 if not head["candidate_id"]:
                     raise ValueError("rollback requires a current release")
             else:
-                if candidate["status"] != "SHADOW":
-                    raise ValueError("candidate must complete shadow before publication")
-                for stage in ("STATIC_PASSED", "VALIDATION_PASSED", "HOLDOUT_PASSED", "HUMAN_APPROVED", "SHADOW"):
+                govern=candidate['kind']=='skill' and candidate['name']=='govern-review'
+                if govern and candidate['policy'].get('release_flow')!='feedback-validation-holdout-human-v1':
+                    raise ValueError('legacy Govern candidate: regenerate and evaluate under the current release flow')
+                required=("STATIC_PASSED", "VALIDATION_PASSED", "HOLDOUT_PASSED", "HUMAN_APPROVED")
+                if not govern:required=(*required,'SHADOW')
+                if candidate['status']!=('HUMAN_APPROVED' if govern else 'SHADOW'):
+                    raise ValueError('candidate must complete human approval before publication' if govern else 'candidate must complete shadow before publication')
+                for stage in required:
                     if reports.get(stage, {}).get("passed") is not True:
                         raise ValueError("missing release evidence: " + stage)
-                if reports["SHADOW"].get("production_ready") is not True:
+                test_release = (local_test is True and
+                    candidate['lineage'].get('source') == 'local-integration-fixture' and
+                    reports.get('HUMAN_APPROVED', {}).get('approved_by') == 'user-authorized-test-runner' and
+                    all(reports.get(stage, {}).get('source') == 'local-integration-fixture'
+                        and reports[stage].get('model_called') is False
+                        for stage in (('VALIDATION_PASSED','HOLDOUT_PASSED') if govern else ('VALIDATION_PASSED','HOLDOUT_PASSED','SHADOW'))))
+                if local_test and not test_release:
+                    raise ValueError('local test publication requires fixture provenance at every gate')
+                if not govern and reports["SHADOW"].get("production_ready") is not True and not test_release:
                     raise ValueError("controlled data cannot authorize a production release")
                 baseline = candidate["baseline"]
                 if baseline.get("candidate_id") != head["candidate_id"] or baseline.get("generation") != head["generation"]:
@@ -309,6 +371,8 @@ class CandidateStoreMixin(MemoryExperienceStoreMixin, EvolutionLeaseStoreMixin):
                                       "archive prior configuration as rollback point", baseline_lineage, stamp)
             release = {"previous_candidate_id": previous_id, "generation": head["generation"] + 1,
                        "actor": actor, "reason": str(reason)[:2000], "rollback": bool(rollback), "created_at": stamp}
+            if local_test:
+                release['source'] = 'local-integration-fixture'
             reports["release"] = release
             updated = self._candidate_execute(conn,
                 "UPDATE evolution_candidates SET status='ACTIVE',revision=?,reports_json=?,updated_at=? WHERE id=? AND tenant_id=? AND revision=?",

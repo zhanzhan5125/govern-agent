@@ -180,6 +180,18 @@ def capture(path, scope):
     return value
 
 
+def diff_path(header):
+    """Decode Git's C-quoted path or unquoted path + TAB timestamp separator."""
+    if header.startswith('"'):
+        match=re.match(r'"(?:\\.|[^"\\])*"',header)
+        if not match:raise ValueError('malformed quoted Git path')
+        value=ast.literal_eval(match.group(0))
+        try:value=value.encode('latin1').decode('utf-8')
+        except (UnicodeEncodeError,UnicodeDecodeError):pass
+    else:value=header.split('\t',1)[0]
+    return value[2:] if value.startswith(('a/','b/')) else value
+
+
 def symbols(path, text):
     if Path(path).suffix in {".py", ".pyi"}:
         try:
@@ -196,6 +208,14 @@ def symbols(path, text):
                 else:
                     walk(child, prefix)
         walk(tree)
+        return result
+    if Path(path).suffix == '.vue':
+        result=[]
+        for script in re.finditer(r'<script\b([^>]*)>([\s\S]*?)</script\s*>',text,re.I):
+            suffix='.ts' if re.search(r'lang\s*=\s*[\'"]ts[\'"]',script.group(1),re.I) else '.js'
+            offset=text[:script.start(2)].count('\n')
+            for item in symbols(path+suffix,script.group(2)):
+                result.append({**item,'start':item['start']+offset,'end':item['end']+offset})
         return result
     if Path(path).suffix not in SOURCE:
         return []
@@ -233,9 +253,9 @@ def change_units(snapshot):
         if raw.startswith("diff --git "):
             in_hunk = False
         elif raw.startswith("--- ") and not in_hunk:
-            old_path = raw[4:].removeprefix("a/")
+            old_path = diff_path(raw[4:])
         elif raw.startswith("+++ ") and not in_hunk:
-            path = raw[4:].removeprefix("b/")
+            path = diff_path(raw[4:])
         elif raw.startswith("@@ "):
             match = re.match(r"@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@", raw)
             if match:
@@ -245,7 +265,11 @@ def change_units(snapshot):
                 side = "head" if raw[0] == "+" else "base"
                 file_path = path if side == "head" else old_path
                 line = max(1, new_line if side == "head" else old_line)
-                text = snapshot[side + "_files"].get(file_path, "")
+                if file_path not in snapshot[side + "_files"]:
+                    raise ValueError('changed source unavailable in frozen snapshot: '+file_path)
+                text = snapshot[side + "_files"][file_path]
+                if not 1 <= line <= len(text.splitlines()):
+                    raise ValueError('changed line outside frozen source: '+file_path)
                 if (side, file_path) not in symbol_cache:
                     symbol_cache[(side, file_path)] = symbols(file_path, text)
                 syms = symbol_cache[(side, file_path)]
@@ -255,11 +279,13 @@ def change_units(snapshot):
                 key = (file_path, symbol["name"], symbol["start"], side, chunk)
                 if key not in units:
                     start = max(1, symbol["start"] + chunk*120 - 3)
-                    end = min(symbol["end"]+3, start+126)
+                    end = min(len(text.splitlines()),symbol["end"]+3, start+126)
+                    if end < start:raise ValueError('invalid changed context range: '+file_path)
                     context = "\n".join(text.splitlines()[start-1:end])
                     units[key] = {"path": file_path, "side": side, "symbol": symbol, "changed_lines": [],
                         "context_start": start, "context_end": end, "context": context[:20000],
                         "context_truncated": len(context)>20000, "hunks": []}
+                    units[key]['context_blank']=not context.strip()
                 units[key]["changed_lines"].append(line)
                 units[key]["hunks"].append(raw)
             if raw[0] != "+": old_line += 1

@@ -1882,7 +1882,7 @@ flowchart TD
 | 参数默认值 | [config.py](<../../src/govern/core/config.py>) |
 | Skill 资源与权限 | [skills.py](<../../src/govern/skills/skills.py>) |
 | 修复两条路径及验证区别 | [fixer.py](<../../src/govern/repair/fixer.py>)、[patching.py](<../../src/govern/repair/patching.py>)、[verifier.py](<../../src/govern/repair/verifier.py>) |
-| 部署版本和卷 | [Compose 配置](<../../docker-compose.yml>) |
+| 部署版本和卷 | [Compose 配置](<../../compose.govern.yaml>) |
 | 简历写作原则 | [STAR 指南](<STAR法则_项目与实习经历编写指南.md>) |
 
 外部官方资料只用于校对数据库、消息和容器的一般原理，不作为项目已实现或已上线的证据。技术栈章节已在对应知识点附近附链接。

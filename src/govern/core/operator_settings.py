@@ -12,12 +12,27 @@ from govern.integrations.atlassian import adapter
 from govern.runtime.verification import VerificationGateway, ExecutionProfile
 
 
+def settings_request_allowed(peer, host, origin):
+    """Allow native loopback, or the explicitly enabled Docker default gateway.
+
+    Gateway requests additionally require a same-origin browser request to a
+    loopback Host. Forwarded headers are deliberately ignored.
+    """
+    parsed=urllib.parse.urlsplit(origin or '')
+    if origin and (parsed.scheme not in {'http','https'} or parsed.netloc!=host):return False
+    if peer in {'127.0.0.1','::1'}:return True
+    return (peer==os.environ.get('GOVERN_SETTINGS_TRUSTED_PEER','') and bool(origin)
+            and parsed.hostname in {'127.0.0.1','localhost','::1'})
+
+
 def public_settings(w):
+    from govern.integrations.github_readonly import client_for
     from govern.policy.auto_evolution import configuration
     model=w.service.llm_config or {};jira=w.config.get('jira',{});mcp=jira.get('mcp',{})
     return {'model':{'provider':model.get('provider','custom'),'base_url':model.get('base_url',''),
         'model':model.get('model',''),'key_configured':bool(model.get('api_key')),
         'configured':all(model.get(k) for k in ('base_url','model','api_key'))},
+        'github':{'token_configured':bool(client_for(w).token),'api_base':'https://api.github.com','access':'read-only'},
         'jira':{'configured':bool(w.jira.client),'transport':'http' if mcp.get('url') else 'stdio',
             'requirements_ready':bool(w.jira.client) and (bool(jira.get('cloud_id')) if jira.get('preset')=='atlassian' else all(jira.get('tools',{}).get(k) for k in ('get_issue','list_requirements'))),
             'preset':jira.get('preset','custom'),'cloud_id':jira.get('cloud_id',''),'email':jira.get('email',''),'auth':jira.get('auth','basic'),
@@ -41,6 +56,14 @@ def save_settings(w,payload):
         if any(t['state'] in {'PENDING','EXECUTING','PLANNING','VALIDATING'} for t in w.store.list_tasks(100)):
             raise ValueError('有任务正在运行，请等待完成或取消后再修改连接配置')
         config=json.loads(json.dumps(w.config))
+        if 'github' in payload:
+            from govern.integrations.github_readonly import client_for
+            supplied=payload['github']
+            if not isinstance(supplied,dict):raise ValueError('GitHub配置应为对象')
+            token=supplied.get('token','')
+            if not isinstance(token,str) or len(token)>2048 or any(ord(c)<33 or ord(c)>126 for c in token):
+                raise ValueError('GitHub Token格式无效，不应包含空白或换行')
+            config['github']={'token':'' if supplied.get('clear_token') is True else token or client_for(w).token}
         if 'auto_evolution' in payload:
             from govern.policy.auto_evolution import validate
             config['auto_evolution']=validate(payload['auto_evolution'])
@@ -93,7 +116,7 @@ def save_settings(w,payload):
         location=Path(os.environ.get('GOVERN_CONFIG',Path.cwd()/'.govern/config.json'))
         location.parent.mkdir(parents=True,exist_ok=True)
         temporary=location.with_suffix('.tmp')
-        temporary.write_text(json.dumps(config,ensure_ascii=False,indent=2),encoding='utf-8');os.replace(temporary,location)
+        temporary.write_text(json.dumps(config,ensure_ascii=False,indent=2),encoding='utf-8');temporary.chmod(0o600);os.replace(temporary,location)
         os.environ['GOVERN_CONFIG']=str(location)
         if auto_only:
             w.config=config
@@ -107,6 +130,16 @@ def save_settings(w,payload):
         w.evolution=GovernEvolution(w)
         if getattr(w,'auto_evolution',None):w.auto_evolution.wake.set()
         return public_settings(w)
+
+
+def test_github(w,payload):
+    from govern.integrations.github_readonly import client_for
+    repository=str(payload.get('repository',''))
+    import re
+    if not re.fullmatch(r'[\w.-]+/[\w.-]+',repository):raise ValueError('请输入 owner/repository 格式的目标仓库')
+    value=client_for(w).get_repository(repository)
+    return {'connected':True,'repository':value.get('full_name',repository),'private':bool(value.get('private')),'access':'read-only',
+            'scope':'metadata-only; PR capture also checks Git source access'}
 
 
 def test_model(w):

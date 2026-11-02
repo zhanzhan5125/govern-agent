@@ -74,7 +74,7 @@ class GitHubClient:
                 method=method,
             )
             try:
-                with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                with getattr(self, '_open', urllib.request.urlopen)(request, timeout=self.timeout) as response:
                     body = response.read()
                     if raw:
                         return body

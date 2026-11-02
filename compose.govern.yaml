@@ -1,0 +1,63 @@
+name: govern-agent
+services:
+  govern-agent:
+    container_name: govern-agent
+    image: govern-agent:local
+    build:
+      context: .
+      dockerfile: Dockerfile.govern
+    init: true
+    restart: unless-stopped
+    depends_on:
+      govern-verifier:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${GOVERN_WEB_PORT:-8080}:8080"
+    environment:
+      GOVERN_STORAGE: sqlite
+      GOVERN_AUTO_EVOLUTION_MODEL_CALLS: "0"
+      GOVERN_SETTINGS_ALLOW_DOCKER_GATEWAY: "1"
+      GOVERN_VERIFIER_SOCKET: /run/govern-verifier/verifier.sock
+      EVOAGENT_AUTH_REQUIRED: "false"
+      EVOAGENT_REDIS_URL: ""
+      EVOAGENT_LLM_PROVIDER: local
+    volumes:
+      - verifier-channel:/run/govern-verifier:ro
+      # Continue the original local database/config, never make a second history.
+      - type: bind
+        source: ./.govern
+        target: /var/lib/govern
+      - type: bind
+        source: ./policies
+        target: /app/policies
+      - type: bind
+        source: ${GOVERN_REPOSITORY_PATH:-./.govern/repositories}
+        target: /repositories/project
+        read_only: true
+  govern-verifier:
+    container_name: govern-verifier
+    image: govern-verifier:local
+    build:
+      context: .
+      dockerfile: Dockerfile.verifier
+    init: true
+    restart: unless-stopped
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    pids_limit: 128
+    cpus: 1
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=64m
+    volumes:
+      - verifier-channel:/run/govern-verifier
+      - /var/run/docker.sock:/var/run/docker.sock
+      - type: bind
+        source: ./.govern/verification-profiles.json
+        target: /etc/govern-verifier/profiles.json
+        read_only: true
+volumes:
+  verifier-channel:

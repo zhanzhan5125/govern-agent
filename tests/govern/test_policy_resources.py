@@ -129,6 +129,8 @@ class PolicyResourceTests(unittest.TestCase):
             github_webhook_secret='',github_token='',auto_post_review=False)
         w = SimpleNamespace(store=TaskStore(settings.db_path),config={},
             service=SimpleNamespace(settings=settings,llm_config={}), verification=SimpleNamespace(profiles={}))
+        from govern.review.workbench import GovernWorkbench
+        w.context_policy=lambda:GovernWorkbench.context_policy(w)
         return GovernEvolution(w)
 
     def test_live_feedback_usage_survives_restart_and_rejection_allows_retry(self):
@@ -147,6 +149,10 @@ class PolicyResourceTests(unittest.TestCase):
         p.workbench.service.llm_config={'model':'fake-test-only'}
         p.workbench.bridge=SimpleNamespace(run=run)
         generated=p.generate('default','tester')['candidates'][0]
+        batch=store.list_govern_evolution_batches('default')[0]
+        self.assertEqual(batch['id'],generated['lineage']['batch_id'])
+        self.assertEqual(1,generated['lineage']['batch_version'])
+        self.assertEqual('GENERATED',batch['status'])
         self.assertEqual(['feedback-1'],generated['lineage']['feedback_ids'])
         self.assertEqual(1,generated['lineage']['sampling']['selected'])
         self.assertEqual(1,len(store.evolution_feedback_links('default')))
@@ -163,6 +169,24 @@ class PolicyResourceTests(unittest.TestCase):
         try:
             with self.assertRaisesRegex(CandidateConflict,'already running'):p.generate('default','tester')
         finally:p.generation_lock.release()
+
+    def test_one_generation_creates_one_multi_stage_bundle(self):
+        p=self.pipeline();store=p.store
+        for stage in ('correctness','security'):
+            store.create(stage,'live/'+stage,None,{'govern':True})
+            with store._connect() as conn:store._candidate_execute(conn,"UPDATE tasks SET state='SUCCESS' WHERE id=?",(stage,))
+            finding={'finding_id':'F-'+stage,'source_stage':stage,'path':'a.py','line':1}
+            feedback={'feedback_id':'fb-'+stage,'type':'missed_issue','finding':finding,'source_stage':stage,'reason_code':'missed_behavior','reason':'Boundary contract missed'}
+            store.save_checkpoint(stage,'govern-feedback',{'history':[feedback]},'completed')
+            store.record_failure_case(stage,'missed_issue',{'finding':finding,'feedback_id':feedback['feedback_id']})
+        p.workbench.service.llm_config={'model':'fake-test-only'}
+        p.workbench.bridge=SimpleNamespace(run=lambda request,*args:{'stage':request['input']['stage'],'guidance':'Check boundary '+request['input']['stage'],'rationale':'confirmed feedback'})
+        result=p.generate('default','tester')
+        self.assertEqual(1,len(result['candidates']))
+        c=result['candidates'][0]
+        self.assertEqual({'correctness','security'},set(c['lineage']['stages']))
+        self.assertEqual(2,len(c['lineage']['feedback_context']))
+        self.assertEqual('',c['content']['files']['stages/validator.md'])
 
     def test_candidate_may_change_only_one_attributed_stage(self):
         p = self.pipeline()

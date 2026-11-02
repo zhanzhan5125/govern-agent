@@ -255,6 +255,7 @@ def generate_controlled_pr_cases() -> List[dict]:
             "path": path,
             "diff": diff,
             "after": after,
+            "before": before,
             "scenario": scenario,
             "target_line": target.line,
         })
@@ -264,7 +265,7 @@ def generate_controlled_pr_cases() -> List[dict]:
         before, after = _clean_source(index)
         by_repo[repository].append({
             "kind": "clean", "path": path,
-            "diff": _unified_diff(path, before, after), "after": after,
+            "diff": _unified_diff(path, before, after), "after": after, "before": before,
         })
 
     cases = []
@@ -302,6 +303,7 @@ def generate_controlled_pr_cases() -> List[dict]:
                 },
                 "diff": item["diff"],
                 "after_files": {item["path"]: item["after"]},
+                "before_files": {item["path"]: item["before"]},
                 "expected_findings": expected,
                 "repair_validation": repair_validation,
             })

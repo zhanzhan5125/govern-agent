@@ -140,7 +140,8 @@ class VerificationGateway:
     def __init__(self, artifacts, profiles=None, backend=None):
         self.artifacts = artifacts
         self.profiles = profiles or {}
-        self.backend = backend or DockerBackend()
+        from govern.runtime.verifier_client import configured_backend
+        self.backend = backend or configured_backend()
         self.semaphore = threading.BoundedSemaphore(2)
         self._attempts = {}; self._elapsed = {}; self._lock = threading.Lock()
 

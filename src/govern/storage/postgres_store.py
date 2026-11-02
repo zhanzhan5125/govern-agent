@@ -1315,5 +1315,7 @@ class PostgresTaskStore(CandidateStoreMixin):
 def create_store(database_url: str, sqlite_path: str):
     if database_url.startswith(("postgres://", "postgresql://")):
         return PostgresTaskStore(database_url)
+    if database_url:
+        raise ValueError('Unsupported database URL; expected postgres:// or postgresql://. Refusing silent SQLite fallback.')
     from govern.storage.store import TaskStore
     return TaskStore(sqlite_path)

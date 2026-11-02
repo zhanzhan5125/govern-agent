@@ -50,8 +50,19 @@ class EvolutionDataset:
         return copy.deepcopy([x for x in self._cases if x["split"] == phase])
 
     def summary(self):
+        items=self._cases+self._shadow
+        counts={p:len(self.cases(p)) for p in ('train','validation','holdout','shadow')}
         return {"sha256": self.fingerprint, "production_ready": self.production_ready,
-                "counts": {p: len(self.cases(p)) for p in ("train", "validation", "holdout", "shadow")}}
+                "counts":counts,"total_cases":len(items),
+                "mechanism_ready":bool(counts['validation'] and counts['holdout']),
+                "source_kinds":sorted({(c.get('source') or {}).get('kind','unknown') for c in items}),
+                "p01_labeled_findings":sum(f.get('business_priority') in {'P0','P1'} for c in items for f in c['expected_findings']),
+                "production_gates":{
+                    'minimum_300_core_cases':len(self._cases)>=300,
+                    'real_pr_provenance':bool(items) and all((c.get('source') or {}).get('kind') in {'public-github-pr','private-historical-pr'} for c in items),
+                    'explicit_human_comment_labels':bool(items) and all('should_comment' in f for c in items for f in c['expected_findings']),
+                    'train_validation_holdout_shadow_present':all(counts.values())},
+                **getattr(self,'catalog',{})}
 
 
 class EvolutionProductReviewer:

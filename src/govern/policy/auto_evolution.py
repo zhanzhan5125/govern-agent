@@ -73,7 +73,7 @@ class AutomaticEvolution:
         pipeline=self.w.evolution
         base=pipeline._baseline(tenant,'skill','govern-review')['content']
         bundle=compile_bundle(overrides(base))
-        protected=sum([pipeline.dataset.cases(p) for p in ('train','validation','holdout','shadow')],[])
+        protected=pipeline.dataset.cases('validation')+pipeline.dataset.cases('holdout')
         groups,pool=pending_groups(store,tenant,ROLES,protected,digest(base),bundle['source_sha256'])
         counts=Counter()
         for key,examples in groups.items():counts[key[0]]+=len(examples)

@@ -32,6 +32,7 @@ def bounded_examples(examples, max_cases=10, max_bytes=24000):
 
 
 def pending_groups(store, tenant, roles, protected, baseline_hash, source_hash, max_pending=100):
+    from govern.policy.failure_diagnosis import feedback_target
     protected_repos={x['repository'] for x in protected}
     protected_diffs={digest(x['diff']) for x in protected}
     blocked=set();blocked_fingerprints=set()
@@ -43,7 +44,7 @@ def pending_groups(store, tenant, roles, protected, baseline_hash, source_hash, 
         if published or current_pending:
             blocked.update(link.get('feedback_ids',[]))
             blocked_fingerprints.update(link.get('case_fingerprints',[]))
-    groups=defaultdict(list);seen=set(); selected=0;scanned=0
+    groups=defaultdict(list);seen=set(); selected=0;scanned=0;routes=defaultdict(int)
     # Paginated database traversal, rather than list_tasks(200). No history deletion.
     for failure in store.iter_feedback_failures(tenant):
         scanned+=1; payload=failure.get('payload') or {}; fid=payload.get('feedback_id')
@@ -59,17 +60,35 @@ def pending_groups(store, tenant, roles, protected, baseline_hash, source_hash, 
                      (f.get('finding') or {}).get('finding_id')==finding_id),None) if finding_id else None
         if not latest or latest['feedback_id']!=fid:continue
         if latest['type'] not in {'false_positive','missed_issue'} or latest['source_stage'] not in roles:continue
-        if latest.get('reason_code') in {'tool_unavailable','permission_denied','budget_exhausted','role_timeout','snapshot_missing','environment_error'}:continue
+        target=feedback_target(latest.get('reason_code'));routes[target]+=1
+        if target!='prompt_skill':continue
+        finding=latest['finding']
+        # Both frozen sides are valid; do not restore legacy added-line-only routing.
+        if not finding.get('path') or not isinstance(finding.get('line'),int) or finding['line']<1:continue
+        evidence_status='legacy-human-location'
+        frozen=store.load_checkpoints(task['id']).get('govern-input',{}).get('state',{})
+        if frozen.get('snapshot_ref'):
+            from govern.runtime.artifacts import ArtifactStore
+            try:
+                snapshot=ArtifactStore(store).get(frozen['snapshot_ref'].removeprefix('artifact://'),tenant)
+                side=finding.get('side','head')
+                lines=snapshot.get(side+'_files',{}).get(finding['path'],'').splitlines()
+                if side not in {'base','head'} or finding['line']>len(lines):
+                    routes['needs_human_label']+=1;continue
+                if finding.get('evidence') and str(finding['evidence']).strip() not in lines[finding['line']-1]:
+                    routes['needs_human_label']+=1;continue
+                evidence_status='frozen-location-verified'
+            except (KeyError,ValueError,PermissionError):
+                routes['needs_human_label']+=1;continue
         signature=digest([task['id'],finding_id,latest['type'],latest['source_stage'],latest['reason_code'],latest['reason']])
         if signature in seen or signature in blocked_fingerprints:continue
         seen.add(signature)
-        finding=latest['finding']
         example={'feedback_id':fid,'failure_case_id':failure['id'],'task_id':task['id'],'case_fingerprint':signature,
-                 'repository':task['repository'],'reason':compact(latest['reason']),
+                 'repository':task['repository'],'reason':compact(latest['reason']),'evidence_status':evidence_status,
                  'finding':compact({k:finding[k] for k in ('finding_id','path','line','side','title','description',
                      'source_stage','rule_id','evidence_refs','related_tests','impact_scope') if k in finding})}
         groups[(latest['source_stage'],latest['type'],latest['reason_code'])].append(example)
         selected+=1
         if selected>=max_pending:break
-    return groups,{'scanned_failure_records':scanned,'eligible_in_window':selected,
+    return groups,{'scanned_failure_records':scanned,'eligible_in_window':selected,'diagnosis_routes':dict(routes),
                    'pending_window_limit':max_pending,'history_preserved':True}

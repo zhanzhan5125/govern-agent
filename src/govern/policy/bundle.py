@@ -90,7 +90,7 @@ def compile_bundle(overrides=None, root=None):
             "output_contract": contract, "stage_sources": sources, "stage_overrides": {r: overrides.get(r, "") for r in ROLES},
             "effective_skills": skills, "stage_editable_bodies": effective, "skill_metadata": metadata,
             "tool_profiles": effective_profiles,
-            "specialist_fragments": fragments, "evolution_scope": "one-stage-supplement-only",
+            "specialist_fragments": fragments, "evolution_scope": "stage-supplements-only",
             "fragment_hashes": {k: digest(v) for k, v in stages.items()},
             "report_fields": ["风险等级", "来源模块", "关联测试用例", "风险位置", "问题描述", "影响范围", "修复建议", "证据依据"]}
 
@@ -174,4 +174,9 @@ def render_report(run_id, result):
             lines += [f"### {key}", "", clean(value), ""]
     if not result.get("findings"):
         lines.append("未输出已核验问题；不代表不存在缺陷，请结合覆盖限制。")
+    if result.get('filtered_findings'):
+        lines += ['', '## 非缺陷说明与过滤记录', '', '以下记录不计入 Finding，亦不代表已确认的新增缺陷。', '',
+                  clean([{k:f.get(k) for k in ('finding_id','source_stage','title','reason')} for f in result['filtered_findings']])]
+    if result.get('observations'):
+        lines += ['', '## 补充审查说明（非 Finding）', '', clean(result['observations'])]
     return "\n".join(lines)
